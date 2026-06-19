@@ -1,13 +1,51 @@
 "use client";
 
-import { GitBranch, Sparkles } from "lucide-react";
+import { AlertCircle, GitBranch, Loader2, Sparkles } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EmptyState } from "@/components/workspace/EmptyState";
+import { useWorkspace } from "@/components/workspace/WorkspaceProvider";
+
+function AnalysisLoadingState() {
+  return (
+    <div className="flex min-h-[320px] flex-col items-center justify-center gap-2 p-6 text-center">
+      <Loader2 className="size-8 animate-spin text-muted-foreground/60" />
+      <p className="text-sm text-muted-foreground">
+        Scanning code architecture...
+      </p>
+    </div>
+  );
+}
+
+function AnalysisErrorState({
+  message,
+  onDismiss,
+}: {
+  message: string;
+  onDismiss: () => void;
+}) {
+  return (
+    <div className="flex min-h-[320px] flex-col items-center justify-center gap-3 p-6 text-center">
+      <AlertCircle className="size-8 text-destructive/70" />
+      <p className="max-w-xs text-sm text-destructive">{message}</p>
+      <Button variant="outline" size="sm" onClick={onDismiss}>
+        Dismiss
+      </Button>
+    </div>
+  );
+}
 
 export function AiPanel() {
+  const {
+    analysisResult,
+    isAnalyzing,
+    analysisError,
+    dismissAnalysisError,
+  } = useWorkspace();
+
   return (
     <aside className="flex h-full min-h-0 w-[350px] shrink-0 flex-col border-l border-border bg-muted/30">
       <Tabs defaultValue="diagram" className="flex h-full min-h-0 flex-col gap-0">
@@ -31,12 +69,33 @@ export function AiPanel() {
           className="min-h-0 flex-1 overflow-hidden data-[orientation=horizontal]:mt-0"
         >
           <ScrollArea className="h-full">
-            <EmptyState
-              icon={GitBranch}
-              title="Analyze a file to generate flowchart"
-              description="Your architecture diagram will render here"
-              className="min-h-[320px]"
-            />
+            {isAnalyzing ? (
+              <AnalysisLoadingState />
+            ) : analysisError ? (
+              <AnalysisErrorState
+                message={analysisError}
+                onDismiss={dismissAnalysisError}
+              />
+            ) : analysisResult ? (
+              <div className="space-y-3 p-4">
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  Mermaid Diagram
+                </p>
+                <pre className="overflow-x-auto rounded-lg border border-border bg-background p-3 font-mono text-[11px] leading-5 text-foreground/90">
+                  {analysisResult.mermaid}
+                </pre>
+                <p className="text-xs text-muted-foreground">
+                  Visual diagram rendering arrives on Day 5.
+                </p>
+              </div>
+            ) : (
+              <EmptyState
+                icon={GitBranch}
+                title="Analyze a file to generate flowchart"
+                description="Your architecture diagram will render here"
+                className="min-h-[320px]"
+              />
+            )}
           </ScrollArea>
         </TabsContent>
 
@@ -45,12 +104,30 @@ export function AiPanel() {
           className="min-h-0 flex-1 overflow-hidden data-[orientation=horizontal]:mt-0"
         >
           <ScrollArea className="h-full">
-            <EmptyState
-              icon={Sparkles}
-              title="AI explanation will appear here"
-              description="Runtime logic and step-by-step breakdown after analysis"
-              className="min-h-[320px]"
-            />
+            {isAnalyzing ? (
+              <AnalysisLoadingState />
+            ) : analysisError ? (
+              <AnalysisErrorState
+                message={analysisError}
+                onDismiss={dismissAnalysisError}
+              />
+            ) : analysisResult ? (
+              <div className="space-y-3 p-4">
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  AI Explanation
+                </p>
+                <div className="rounded-lg border border-border bg-background p-3 text-sm leading-6 text-foreground/90 whitespace-pre-wrap">
+                  {analysisResult.explanation}
+                </div>
+              </div>
+            ) : (
+              <EmptyState
+                icon={Sparkles}
+                title="AI explanation will appear here"
+                description="Runtime logic and step-by-step breakdown after analysis"
+                className="min-h-[320px]"
+              />
+            )}
           </ScrollArea>
         </TabsContent>
       </Tabs>

@@ -2,6 +2,11 @@ export { MOCK_ANALYZE_RESPONSE, MAX_ANALYZE_CODE_BYTES } from "@/lib/ai/constant
 export { analyzeCode } from "@/lib/ai/analyze-code";
 export { GeminiError, isGeminiError, type GeminiErrorCode } from "@/lib/ai/errors";
 export { GEMINI_MODEL, getGeminiModel } from "@/lib/ai/gemini";
+export { parseAnalyzeResponse } from "@/lib/ai/parse-response";
+export {
+  ANALYZE_SYSTEM_PROMPT,
+  buildAnalyzeUserPrompt,
+} from "@/lib/ai/prompts";
 export type {
   AnalyzeErrorResponse,
   AnalyzeHealthResponse,

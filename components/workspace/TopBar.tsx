@@ -8,7 +8,20 @@ import { Separator } from "@/components/ui/separator";
 import { useWorkspace } from "@/components/workspace/WorkspaceProvider";
 
 export function TopBar() {
-  const { isLoading, isSupported, openFolder } = useWorkspace();
+  const {
+    selectedFile,
+    fileContent,
+    isLoading,
+    isReadingFile,
+    isAnalyzing,
+    isSupported,
+    openFolder,
+    analyzeFile,
+  } = useWorkspace();
+
+  const canAnalyze = Boolean(
+    selectedFile && fileContent !== null && !isReadingFile && !isAnalyzing
+  );
 
   return (
     <header className="flex h-12 shrink-0 items-center gap-3 border-b border-border bg-background px-4">
@@ -33,9 +46,9 @@ export function TopBar() {
           {isLoading ? <Loader2 className="animate-spin" /> : <FolderOpen />}
           {isLoading ? "Opening..." : "Open Folder"}
         </Button>
-        <Button size="sm" disabled>
-          <Sparkles />
-          Analyze
+        <Button size="sm" disabled={!canAnalyze} onClick={analyzeFile}>
+          {isAnalyzing ? <Loader2 className="animate-spin" /> : <Sparkles />}
+          {isAnalyzing ? "Analyzing..." : "Analyze"}
         </Button>
       </div>
     </header>

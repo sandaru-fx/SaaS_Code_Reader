@@ -1,23 +1,11 @@
 import { GeminiError } from "@/lib/ai/errors";
 import { getGeminiModel } from "@/lib/ai/gemini";
-import type { AnalyzeRequestBody } from "@/lib/ai/types";
-
-function buildBasicAnalysisPrompt({
-  code,
-  language,
-  fileName,
-}: AnalyzeRequestBody): string {
-  const fileLabel = fileName ? `File: ${fileName}\n` : "";
-
-  return `${fileLabel}Language: ${language}
-
-Analyze the following code. Explain what it does, its main logic flow, and any important architecture notes in clear Markdown.
-
-Code:
-\`\`\`${language}
-${code}
-\`\`\``;
-}
+import { parseAnalyzeResponse } from "@/lib/ai/parse-response";
+import {
+  ANALYZE_SYSTEM_PROMPT,
+  buildAnalyzeUserPrompt,
+} from "@/lib/ai/prompts";
+import type { AnalyzeRequestBody, AnalyzeResponseBody } from "@/lib/ai/types";
 
 function mapGeminiFailure(error: unknown): GeminiError {
   if (error instanceof GeminiError) {
@@ -56,21 +44,41 @@ function mapGeminiFailure(error: unknown): GeminiError {
   );
 }
 
-export async function analyzeCode(request: AnalyzeRequestBody): Promise<string> {
+async function requestStructuredAnalysis(
+  request: AnalyzeRequestBody,
+  strict: boolean
+): Promise<AnalyzeResponseBody> {
+  const model = getGeminiModel({ systemInstruction: ANALYZE_SYSTEM_PROMPT });
+  const prompt = buildAnalyzeUserPrompt(request, strict);
+  const result = await model.generateContent(prompt);
+  const text = result.response.text().trim();
+
+  if (!text) {
+    throw new GeminiError(
+      "generation-failed",
+      "Gemini returned an empty analysis response."
+    );
+  }
+
+  return parseAnalyzeResponse(text);
+}
+
+export async function analyzeCode(
+  request: AnalyzeRequestBody
+): Promise<AnalyzeResponseBody> {
   try {
-    const model = getGeminiModel();
-    const prompt = buildBasicAnalysisPrompt(request);
-    const result = await model.generateContent(prompt);
-    const text = result.response.text().trim();
+    try {
+      return await requestStructuredAnalysis(request, false);
+    } catch (firstError) {
+      if (
+        firstError instanceof GeminiError &&
+        firstError.code !== "generation-failed"
+      ) {
+        throw firstError;
+      }
 
-    if (!text) {
-      throw new GeminiError(
-        "generation-failed",
-        "Gemini returned an empty analysis response."
-      );
+      return await requestStructuredAnalysis(request, true);
     }
-
-    return text;
   } catch (error) {
     throw mapGeminiFailure(error);
   }

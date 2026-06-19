@@ -5,7 +5,6 @@ import { isGeminiError } from "@/lib/ai/errors";
 import type {
   AnalyzeErrorResponse,
   AnalyzeHealthResponse,
-  AnalyzeResponseBody,
 } from "@/lib/ai/types";
 import {
   isGeminiConfigured,
@@ -64,15 +63,8 @@ export async function POST(request: Request) {
   }
 
   try {
-    const explanation = await analyzeCode(validation.data);
-
-    const response: AnalyzeResponseBody = {
-      explanation,
-      mermaid:
-        "graph TD\n  A[Selected Code] --> B[Gemini Analysis]\n  B --> C[Structured Mermaid in Kota 3]",
-    };
-
-    return NextResponse.json(response);
+    const analysis = await analyzeCode(validation.data);
+    return NextResponse.json(analysis);
   } catch (error) {
     if (isGeminiError(error)) {
       const errorResponse: AnalyzeErrorResponse = {

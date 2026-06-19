@@ -4,7 +4,11 @@ import { GeminiError } from "@/lib/ai/errors";
 
 export const GEMINI_MODEL = "gemini-1.5-flash";
 
-export function getGeminiModel() {
+type GeminiModelOptions = {
+  systemInstruction?: string;
+};
+
+export function getGeminiModel(options?: GeminiModelOptions) {
   const apiKey = process.env.GEMINI_API_KEY?.trim();
 
   if (!apiKey) {
@@ -15,5 +19,8 @@ export function getGeminiModel() {
   }
 
   const client = new GoogleGenerativeAI(apiKey);
-  return client.getGenerativeModel({ model: GEMINI_MODEL });
+  return client.getGenerativeModel({
+    model: GEMINI_MODEL,
+    systemInstruction: options?.systemInstruction,
+  });
 }
