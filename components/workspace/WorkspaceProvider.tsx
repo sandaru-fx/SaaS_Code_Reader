@@ -17,10 +17,12 @@ import {
 
 type WorkspaceContextValue = {
   fileTree: FileNode | null;
+  selectedFile: FileNode | null;
   isLoading: boolean;
   error: string | null;
   isSupported: boolean;
   openFolder: () => Promise<void>;
+  selectFile: (node: FileNode) => void;
   dismissError: () => void;
 };
 
@@ -32,6 +34,7 @@ export function WorkspaceProvider({
   children: React.ReactNode;
 }>) {
   const [fileTree, setFileTree] = useState<FileNode | null>(null);
+  const [selectedFile, setSelectedFile] = useState<FileNode | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const isSupported = useMemo(() => isFileSystemAccessSupported(), []);
@@ -50,6 +53,7 @@ export function WorkspaceProvider({
     try {
       const tree = await pickAndBuildFileTree();
       setFileTree(tree);
+      setSelectedFile(null);
     } catch (err) {
       if (isFileSystemAccessError(err) && err.code === "aborted") {
         return;
@@ -70,16 +74,35 @@ export function WorkspaceProvider({
     setError(null);
   }, []);
 
+  const selectFile = useCallback((node: FileNode) => {
+    if (node.type !== "file") {
+      return;
+    }
+
+    setSelectedFile(node);
+  }, []);
+
   const value = useMemo(
     () => ({
       fileTree,
+      selectedFile,
       isLoading,
       error,
       isSupported,
       openFolder,
+      selectFile,
       dismissError,
     }),
-    [fileTree, isLoading, error, isSupported, openFolder, dismissError]
+    [
+      fileTree,
+      selectedFile,
+      isLoading,
+      error,
+      isSupported,
+      openFolder,
+      selectFile,
+      dismissError,
+    ]
   );
 
   return (

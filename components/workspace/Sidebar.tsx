@@ -6,19 +6,26 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { EmptyState } from "@/components/workspace/EmptyState";
+import { FileTree } from "@/components/workspace/FileTree";
 import { useWorkspace } from "@/components/workspace/WorkspaceProvider";
-import { countFileNodes } from "@/lib/file-system/tree-utils";
 
 export function Sidebar() {
-  const { fileTree, isLoading, error, isSupported, dismissError } =
-    useWorkspace();
+  const {
+    fileTree,
+    selectedFile,
+    isLoading,
+    error,
+    isSupported,
+    selectFile,
+    dismissError,
+  } = useWorkspace();
 
   const headerLabel = fileTree ? fileTree.name : "File Explorer";
 
   return (
     <aside className="flex h-full min-h-0 w-[250px] shrink-0 flex-col border-r border-border bg-sidebar">
       <div className="flex h-10 shrink-0 items-center gap-2 px-3">
-        <FolderTree className="size-4 text-muted-foreground" />
+        <FolderTree className="size-4 shrink-0 text-muted-foreground" />
         <span
           className="truncate text-xs font-medium uppercase tracking-wide text-muted-foreground"
           title={headerLabel}
@@ -51,11 +58,10 @@ export function Sidebar() {
             </Button>
           </div>
         ) : fileTree ? (
-          <EmptyState
-            icon={FolderTree}
-            title={`${fileTree.name} loaded`}
-            description={`${countFileNodes(fileTree)} files found. File tree UI arrives in Phase 3.`}
-            className="min-h-[280px]"
+          <FileTree
+            tree={fileTree}
+            selectedPath={selectedFile?.path ?? null}
+            onSelectFile={selectFile}
           />
         ) : (
           <EmptyState

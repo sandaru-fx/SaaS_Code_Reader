@@ -1,13 +1,21 @@
+"use client";
+
 import { FileCode2 } from "lucide-react";
 
 import { EmptyState } from "@/components/workspace/EmptyState";
+import { useWorkspace } from "@/components/workspace/WorkspaceProvider";
 
 export function CodeViewer() {
+  const { selectedFile } = useWorkspace();
+
   return (
     <main className="flex min-w-0 flex-1 flex-col bg-muted/20">
       <div className="flex h-10 shrink-0 items-center border-b border-border bg-background px-4">
-        <span className="font-mono text-xs text-muted-foreground">
-          No file selected
+        <span
+          className="truncate font-mono text-xs text-muted-foreground"
+          title={selectedFile?.path}
+        >
+          {selectedFile ? selectedFile.path : "No file selected"}
         </span>
       </div>
 
@@ -23,8 +31,16 @@ export function CodeViewer() {
         <div className="flex flex-1 items-center justify-center bg-background/80">
           <EmptyState
             icon={FileCode2}
-            title="Select a file from the sidebar"
-            description="File contents will appear here with syntax highlighting"
+            title={
+              selectedFile
+                ? `${selectedFile.name} selected`
+                : "Select a file from the sidebar"
+            }
+            description={
+              selectedFile
+                ? "File content loading arrives on Day 3"
+                : "File contents will appear here with syntax highlighting"
+            }
             iconClassName="size-10"
           />
         </div>
