@@ -1,3 +1,5 @@
+export const MAX_FILE_SIZE_BYTES = 100 * 1024;
+
 export const SKIP_DIRECTORY_NAMES = new Set([
   "node_modules",
   ".git",

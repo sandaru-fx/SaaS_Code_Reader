@@ -1,49 +1,83 @@
 "use client";
 
-import { FileCode2 } from "lucide-react";
+import { AlertCircle, FileCode2, Loader2 } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
+import { CodeBlock } from "@/components/workspace/CodeBlock";
 import { EmptyState } from "@/components/workspace/EmptyState";
 import { useWorkspace } from "@/components/workspace/WorkspaceProvider";
 
 export function CodeViewer() {
-  const { selectedFile } = useWorkspace();
+  const {
+    selectedFile,
+    fileContent,
+    fileLanguage,
+    isReadingFile,
+    fileError,
+    dismissFileError,
+  } = useWorkspace();
+
+  const lineCount =
+    fileContent !== null && fileContent.length > 0
+      ? fileContent.split("\n").length
+      : 0;
 
   return (
     <main className="flex min-w-0 flex-1 flex-col bg-muted/20">
-      <div className="flex h-10 shrink-0 items-center border-b border-border bg-background px-4">
+      <div className="flex h-10 shrink-0 items-center gap-2 border-b border-border bg-background px-4">
         <span
-          className="truncate font-mono text-xs text-muted-foreground"
+          className="min-w-0 flex-1 truncate font-mono text-xs text-muted-foreground"
           title={selectedFile?.path}
         >
           {selectedFile ? selectedFile.path : "No file selected"}
         </span>
+        {lineCount > 0 ? (
+          <span className="shrink-0 text-[10px] text-muted-foreground">
+            {lineCount} {lineCount === 1 ? "line" : "lines"}
+          </span>
+        ) : null}
+        {fileLanguage ? (
+          <span className="shrink-0 rounded-md bg-muted px-2 py-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
+            {fileLanguage}
+          </span>
+        ) : null}
       </div>
 
-      <div className="relative flex flex-1 overflow-hidden">
-        <div className="hidden w-12 shrink-0 border-r border-border bg-muted/40 sm:block">
-          <div className="flex flex-col items-end gap-1 px-2 py-4 font-mono text-[10px] leading-5 text-muted-foreground/30">
-            {Array.from({ length: 12 }, (_, i) => (
-              <span key={i + 1}>{i + 1}</span>
-            ))}
+      <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-background/80">
+        {!selectedFile ? (
+          <div className="flex flex-1 items-center justify-center">
+            <EmptyState
+              icon={FileCode2}
+              title="Select a file from the sidebar"
+              description="File contents will appear here with syntax highlighting"
+              iconClassName="size-10"
+            />
           </div>
-        </div>
-
-        <div className="flex flex-1 items-center justify-center bg-background/80">
-          <EmptyState
-            icon={FileCode2}
-            title={
-              selectedFile
-                ? `${selectedFile.name} selected`
-                : "Select a file from the sidebar"
-            }
-            description={
-              selectedFile
-                ? "File content loading arrives on Day 3"
-                : "File contents will appear here with syntax highlighting"
-            }
-            iconClassName="size-10"
-          />
-        </div>
+        ) : isReadingFile ? (
+          <div className="flex flex-1 flex-col items-center justify-center gap-2">
+            <Loader2 className="size-8 animate-spin text-muted-foreground/60" />
+            <p className="text-sm text-muted-foreground">Reading file...</p>
+          </div>
+        ) : fileError ? (
+          <div className="flex flex-1 flex-col items-center justify-center gap-3 p-6 text-center">
+            <AlertCircle className="size-8 text-destructive/70" />
+            <p className="max-w-md text-sm text-destructive">{fileError}</p>
+            <Button variant="outline" size="sm" onClick={dismissFileError}>
+              Dismiss
+            </Button>
+          </div>
+        ) : fileContent !== null && fileLanguage ? (
+          <CodeBlock content={fileContent} language={fileLanguage} />
+        ) : (
+          <div className="flex flex-1 items-center justify-center">
+            <EmptyState
+              icon={FileCode2}
+              title={`${selectedFile.name} selected`}
+              description="Unable to display file content"
+              iconClassName="size-10"
+            />
+          </div>
+        )}
       </div>
     </main>
   );

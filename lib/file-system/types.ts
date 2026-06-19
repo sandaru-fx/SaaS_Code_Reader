@@ -8,7 +8,19 @@ export type FileNode = {
   children?: FileNode[];
 };
 
-export type FileSystemErrorCode = "unsupported" | "aborted" | "read-failed";
+export type FileSystemErrorCode =
+  | "unsupported"
+  | "aborted"
+  | "read-failed"
+  | "file-too-large";
+
+export type FileContentResult = {
+  name: string;
+  path: string;
+  content: string;
+  language: string;
+  size: number;
+};
 
 export class FileSystemAccessError extends Error {
   readonly code: FileSystemErrorCode;
