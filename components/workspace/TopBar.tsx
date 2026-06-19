@@ -1,10 +1,15 @@
+"use client";
+
 import Link from "next/link";
-import { FolderOpen, Sparkles } from "lucide-react";
+import { FolderOpen, Loader2, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { useWorkspace } from "@/components/workspace/WorkspaceProvider";
 
 export function TopBar() {
+  const { isLoading, isSupported, openFolder } = useWorkspace();
+
   return (
     <header className="flex h-12 shrink-0 items-center gap-3 border-b border-border bg-background px-4">
       <Link
@@ -19,9 +24,14 @@ export function TopBar() {
       <span className="text-xs text-muted-foreground">Workspace</span>
 
       <div className="ml-auto flex items-center gap-2">
-        <Button variant="outline" size="sm" disabled>
-          <FolderOpen />
-          Open Folder
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={!isSupported || isLoading}
+          onClick={openFolder}
+        >
+          {isLoading ? <Loader2 className="animate-spin" /> : <FolderOpen />}
+          {isLoading ? "Opening..." : "Open Folder"}
         </Button>
         <Button size="sm" disabled>
           <Sparkles />
