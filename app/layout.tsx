@@ -13,7 +13,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CodeRider",
+  title: {
+    default: "CodeRider",
+    template: "%s | CodeRider",
+  },
   description:
     "AI-powered visual code workspace — understand your codebase with flowcharts and explanations.",
 };

@@ -25,16 +25,16 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 app/                  # Next.js App Router pages
 components/
   ui/                 # shadcn/ui components
-  workspace/          # IDE workspace components (Phase 2+)
+  workspace/          # IDE workspace components
 lib/                  # Utilities
 ```
 
 ## MVP Roadmap
 
 - [x] **Phase 1:** Next.js + Tailwind + shadcn/ui bootstrap
-- [ ] **Phase 2:** 3-column workspace layout
-- [ ] **Phase 3:** Routes, polish & empty states
-- [ ] Local folder ingestion (File System API)
+- [x] **Phase 2:** 3-column workspace layout
+- [x] **Phase 3:** Routes, polish & empty states
+- [ ] **Day 2:** Local folder ingestion (File System API)
 - [ ] Code viewer + syntax highlighting
 - [ ] Gemini AI analysis pipeline
 - [ ] Mermaid diagram rendering
