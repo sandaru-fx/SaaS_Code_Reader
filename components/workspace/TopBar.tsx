@@ -10,25 +10,15 @@ import { useWorkspace } from "@/components/workspace/WorkspaceProvider";
 export function TopBar() {
   const {
     mode,
-    selectedFile,
-    fileContent,
     isLoading,
-    isReadingFile,
     isAnalyzing,
     isSupported,
+    canAnalyze,
     switchToFolder,
     switchToPaste,
     openFolder,
     analyzeFile,
   } = useWorkspace();
-
-  const canAnalyze = Boolean(
-    mode === "folder" &&
-      selectedFile &&
-      fileContent !== null &&
-      !isReadingFile &&
-      !isAnalyzing
-  );
 
   return (
     <header className="flex h-12 shrink-0 items-center gap-3 border-b border-border bg-background px-4">

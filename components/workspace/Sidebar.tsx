@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertCircle, FolderTree, Loader2 } from "lucide-react";
+import { AlertCircle, ClipboardPaste, FolderTree, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -11,14 +11,51 @@ import { useWorkspace } from "@/components/workspace/WorkspaceProvider";
 
 export function Sidebar() {
   const {
+    mode,
     fileTree,
     selectedFile,
     isLoading,
     error,
     isSupported,
+    switchToFolder,
     selectFile,
     dismissError,
   } = useWorkspace();
+
+  if (mode === "paste") {
+    return (
+      <aside className="flex h-full min-h-0 w-[250px] shrink-0 flex-col border-r border-border bg-sidebar">
+        <div className="flex h-10 shrink-0 items-center gap-2 px-3">
+          <ClipboardPaste className="size-4 shrink-0 text-muted-foreground" />
+          <span className="truncate text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            Quick Paste
+          </span>
+        </div>
+
+        <Separator />
+
+        <ScrollArea className="min-h-0 flex-1">
+          <EmptyState
+            icon={ClipboardPaste}
+            title="Paste mode active"
+            description="Type or paste a code snippet in the editor, pick a language, then analyze it from the top bar."
+            className="min-h-[280px]"
+          />
+          <div className="px-4 pb-4">
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full"
+              onClick={switchToFolder}
+            >
+              <FolderTree className="size-3.5" />
+              Switch to Folder mode
+            </Button>
+          </div>
+        </ScrollArea>
+      </aside>
+    );
+  }
 
   const headerLabel = fileTree ? fileTree.name : "File Explorer";
 

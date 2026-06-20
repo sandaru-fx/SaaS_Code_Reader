@@ -10,6 +10,11 @@ import {
 } from "react";
 
 import type { AnalyzeResponseBody } from "@/lib/ai/types";
+import { getPasteSnippetFileName } from "@/components/workspace/paste-utils";
+import {
+  DEFAULT_PASTE_LANGUAGE,
+  type WorkspaceMode,
+} from "@/components/workspace/types";
 import {
   isFileSystemAccessError,
   isFileSystemAccessSupported,
@@ -17,10 +22,7 @@ import {
   readFileNode,
   type FileNode,
 } from "@/lib/file-system";
-import {
-  DEFAULT_PASTE_LANGUAGE,
-  type WorkspaceMode,
-} from "@/components/workspace/types";
+import { MAX_FILE_SIZE_BYTES } from "@/lib/file-system/constants";
 
 type WorkspaceContextValue = {
   mode: WorkspaceMode;
@@ -37,6 +39,7 @@ type WorkspaceContextValue = {
   error: string | null;
   fileError: string | null;
   analysisError: string | null;
+  canAnalyze: boolean;
   isSupported: boolean;
   switchToFolder: () => void;
   switchToPaste: () => void;
@@ -80,12 +83,18 @@ function resetAnalysisState(
   setAnalysisError(null);
 }
 
+function getPasteByteLength(code: string): number {
+  return new TextEncoder().encode(code).length;
+}
+
 export function WorkspaceProvider({
   children,
+  initialMode = "folder",
 }: Readonly<{
   children: React.ReactNode;
+  initialMode?: WorkspaceMode;
 }>) {
-  const [mode, setMode] = useState<WorkspaceMode>("folder");
+  const [mode, setMode] = useState<WorkspaceMode>(initialMode);
   const [fileTree, setFileTree] = useState<FileNode | null>(null);
   const [selectedFile, setSelectedFile] = useState<FileNode | null>(null);
   const [fileContent, setFileContent] = useState<string | null>(null);
@@ -103,6 +112,33 @@ export function WorkspaceProvider({
   const [analysisError, setAnalysisError] = useState<string | null>(null);
   const readingPathRef = useRef<string | null>(null);
   const isSupported = useMemo(() => isFileSystemAccessSupported(), []);
+  const pasteByteLength = useMemo(
+    () => getPasteByteLength(pastedCode),
+    [pastedCode]
+  );
+
+  const canAnalyze = useMemo(() => {
+    if (isAnalyzing || isReadingFile) {
+      return false;
+    }
+
+    if (mode === "paste") {
+      return (
+        pastedCode.trim().length > 0 && pasteByteLength <= MAX_FILE_SIZE_BYTES
+      );
+    }
+
+    return Boolean(selectedFile && fileContent !== null && fileLanguage);
+  }, [
+    mode,
+    pastedCode,
+    pasteByteLength,
+    selectedFile,
+    fileContent,
+    fileLanguage,
+    isAnalyzing,
+    isReadingFile,
+  ]);
 
   const switchToFolder = useCallback(() => {
     setMode("folder");
@@ -114,6 +150,16 @@ export function WorkspaceProvider({
     setMode("paste");
     resetFileState(setSelectedFile, setFileContent, setFileLanguage, setFileError);
     readingPathRef.current = null;
+    resetAnalysisState(setAnalysisResult, setAnalysisError);
+  }, []);
+
+  const updatePastedCode = useCallback((code: string) => {
+    setPastedCode(code);
+    resetAnalysisState(setAnalysisResult, setAnalysisError);
+  }, []);
+
+  const updatePastedLanguage = useCallback((language: string) => {
+    setPastedLanguage(language);
     resetAnalysisState(setAnalysisResult, setAnalysisError);
   }, []);
 
@@ -207,9 +253,37 @@ export function WorkspaceProvider({
   }, []);
 
   const analyzeFile = useCallback(async () => {
-    if (!selectedFile || fileContent === null || !fileLanguage) {
-      setAnalysisError("Select a readable file before analyzing.");
-      return;
+    let code: string;
+    let language: string;
+    let fileName: string | undefined;
+
+    if (mode === "paste") {
+      const trimmed = pastedCode.trim();
+
+      if (!trimmed) {
+        setAnalysisError("Paste a code snippet before analyzing.");
+        return;
+      }
+
+      if (pasteByteLength > MAX_FILE_SIZE_BYTES) {
+        setAnalysisError(
+          `Snippet exceeds the maximum size of ${MAX_FILE_SIZE_BYTES} bytes.`
+        );
+        return;
+      }
+
+      code = pastedCode;
+      language = pastedLanguage;
+      fileName = getPasteSnippetFileName(pastedLanguage);
+    } else {
+      if (!selectedFile || fileContent === null || !fileLanguage) {
+        setAnalysisError("Select a readable file before analyzing.");
+        return;
+      }
+
+      code = fileContent;
+      language = fileLanguage;
+      fileName = selectedFile.name;
     }
 
     setIsAnalyzing(true);
@@ -222,9 +296,9 @@ export function WorkspaceProvider({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          code: fileContent,
-          language: fileLanguage,
-          fileName: selectedFile.name,
+          code,
+          language,
+          fileName,
         }),
       });
 
@@ -248,11 +322,23 @@ export function WorkspaceProvider({
 
       setAnalysisResult(data);
     } catch {
-      setAnalysisError("Network error while analyzing the file.");
+      setAnalysisError(
+        mode === "paste"
+          ? "Network error while analyzing the snippet."
+          : "Network error while analyzing the file."
+      );
     } finally {
       setIsAnalyzing(false);
     }
-  }, [selectedFile, fileContent, fileLanguage]);
+  }, [
+    mode,
+    pastedCode,
+    pastedLanguage,
+    pasteByteLength,
+    selectedFile,
+    fileContent,
+    fileLanguage,
+  ]);
 
   const value = useMemo(
     () => ({
@@ -270,11 +356,12 @@ export function WorkspaceProvider({
       error,
       fileError,
       analysisError,
+      canAnalyze,
       isSupported,
       switchToFolder,
       switchToPaste,
-      setPastedCode,
-      setPastedLanguage,
+      setPastedCode: updatePastedCode,
+      setPastedLanguage: updatePastedLanguage,
       openFolder,
       selectFile,
       analyzeFile,
@@ -297,9 +384,12 @@ export function WorkspaceProvider({
       error,
       fileError,
       analysisError,
+      canAnalyze,
       isSupported,
       switchToFolder,
       switchToPaste,
+      updatePastedCode,
+      updatePastedLanguage,
       openFolder,
       selectFile,
       analyzeFile,

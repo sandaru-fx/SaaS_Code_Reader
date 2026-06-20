@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, FolderOpen, GitBranch, Zap } from "lucide-react";
+import { ArrowRight, ClipboardPaste, FolderOpen, GitBranch, Zap } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
@@ -43,10 +43,20 @@ export default function Home() {
             Understand your code visually — AI-powered flowcharts and
             step-by-step logic explanations for vibe-coded projects.
           </p>
-          <Button size="lg" render={<Link href="/workspace" />}>
-            Open Workspace
-            <ArrowRight />
-          </Button>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <Button size="lg" render={<Link href="/workspace" />}>
+              Open Workspace
+              <ArrowRight />
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              render={<Link href="/workspace?mode=paste" />}
+            >
+              <ClipboardPaste />
+              Quick Paste
+            </Button>
+          </div>
         </div>
 
         <div className="grid w-full gap-4 sm:grid-cols-3">
