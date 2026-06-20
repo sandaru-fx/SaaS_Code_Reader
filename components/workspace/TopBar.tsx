@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { UserButton } from "@clerk/nextjs";
 import { ClipboardPaste, FolderOpen, Loader2, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -72,6 +73,7 @@ export function TopBar() {
           {isAnalyzing ? <Loader2 className="animate-spin" /> : <Sparkles />}
           {isAnalyzing ? "Analyzing..." : "Analyze"}
         </Button>
+        <UserButton />
       </div>
     </header>
   );

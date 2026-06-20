@@ -1,7 +1,7 @@
-import Link from "next/link";
-import { ArrowRight, ClipboardPaste, FolderOpen, GitBranch, Zap } from "lucide-react";
+import { FolderOpen, GitBranch, Zap } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import { HeroActions } from "@/components/auth/HeroActions";
+import { LandingHeader } from "@/components/auth/LandingHeader";
 
 const features = [
   {
@@ -24,12 +24,7 @@ const features = [
 export default function Home() {
   return (
     <div className="flex min-h-full flex-1 flex-col">
-      <header className="flex items-center justify-between border-b border-border px-6 py-4">
-        <span className="text-sm font-semibold tracking-tight">CodeRider</span>
-        <Button variant="outline" size="sm" render={<Link href="/workspace" />}>
-          Open Workspace
-        </Button>
-      </header>
+      <LandingHeader />
 
       <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col items-center justify-center gap-10 px-6 py-16">
         <div className="flex flex-col items-center gap-4 text-center">
@@ -43,20 +38,7 @@ export default function Home() {
             Understand your code visually — AI-powered flowcharts and
             step-by-step logic explanations for vibe-coded projects.
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <Button size="lg" render={<Link href="/workspace" />}>
-              Open Workspace
-              <ArrowRight />
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              render={<Link href="/workspace?mode=paste" />}
-            >
-              <ClipboardPaste />
-              Quick Paste
-            </Button>
-          </div>
+          <HeroActions />
         </div>
 
         <div className="grid w-full gap-4 sm:grid-cols-3">
