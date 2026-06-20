@@ -1,5 +1,6 @@
 import { MAX_ANALYZE_CODE_BYTES } from "@/lib/ai/constants";
 import type { AnalyzeRequestBody } from "@/lib/ai/types";
+import { formatFileSize } from "@/lib/file-system/format-bytes";
 
 type ValidationResult =
   | { success: true; data: AnalyzeRequestBody }
@@ -30,7 +31,7 @@ export function validateAnalyzeRequest(body: unknown): ValidationResult {
   if (getByteLength(code) > MAX_ANALYZE_CODE_BYTES) {
     return {
       success: false,
-      error: `Code exceeds the maximum size of ${MAX_ANALYZE_CODE_BYTES} bytes.`,
+      error: `Code exceeds the maximum size of ${formatFileSize(MAX_ANALYZE_CODE_BYTES)}.`,
     };
   }
 

@@ -23,6 +23,7 @@ import {
   type FileNode,
 } from "@/lib/file-system";
 import { MAX_FILE_SIZE_BYTES } from "@/lib/file-system/constants";
+import { formatFileSize } from "@/lib/file-system/format-bytes";
 
 type WorkspaceContextValue = {
   mode: WorkspaceMode;
@@ -39,6 +40,7 @@ type WorkspaceContextValue = {
   error: string | null;
   fileError: string | null;
   analysisError: string | null;
+  folderSkippedCount: number;
   canAnalyze: boolean;
   isSupported: boolean;
   switchToFolder: () => void;
@@ -110,6 +112,7 @@ export function WorkspaceProvider({
   const [error, setError] = useState<string | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
+  const [folderSkippedCount, setFolderSkippedCount] = useState(0);
   const readingPathRef = useRef<string | null>(null);
   const isSupported = useMemo(() => isFileSystemAccessSupported(), []);
   const pasteByteLength = useMemo(
@@ -144,6 +147,7 @@ export function WorkspaceProvider({
     setMode("folder");
     resetPasteState(setPastedCode, setPastedLanguage);
     resetAnalysisState(setAnalysisResult, setAnalysisError);
+    setFolderSkippedCount(0);
   }, []);
 
   const switchToPaste = useCallback(() => {
@@ -151,6 +155,7 @@ export function WorkspaceProvider({
     resetFileState(setSelectedFile, setFileContent, setFileLanguage, setFileError);
     readingPathRef.current = null;
     resetAnalysisState(setAnalysisResult, setAnalysisError);
+    setFolderSkippedCount(0);
   }, []);
 
   const updatePastedCode = useCallback((code: string) => {
@@ -177,8 +182,9 @@ export function WorkspaceProvider({
     setError(null);
 
     try {
-      const tree = await pickAndBuildFileTree();
-      setFileTree(tree);
+      const scanResult = await pickAndBuildFileTree();
+      setFileTree(scanResult.tree);
+      setFolderSkippedCount(scanResult.skippedEntryCount);
       resetFileState(setSelectedFile, setFileContent, setFileLanguage, setFileError);
       resetAnalysisState(setAnalysisResult, setAnalysisError);
       readingPathRef.current = null;
@@ -267,7 +273,7 @@ export function WorkspaceProvider({
 
       if (pasteByteLength > MAX_FILE_SIZE_BYTES) {
         setAnalysisError(
-          `Snippet exceeds the maximum size of ${MAX_FILE_SIZE_BYTES} bytes.`
+          `Snippet exceeds the maximum size of ${formatFileSize(MAX_FILE_SIZE_BYTES)}.`
         );
         return;
       }
@@ -361,6 +367,7 @@ export function WorkspaceProvider({
       error,
       fileError,
       analysisError,
+      folderSkippedCount,
       canAnalyze,
       isSupported,
       switchToFolder,
@@ -389,6 +396,7 @@ export function WorkspaceProvider({
       error,
       fileError,
       analysisError,
+      folderSkippedCount,
       canAnalyze,
       isSupported,
       switchToFolder,

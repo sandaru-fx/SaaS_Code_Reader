@@ -14,6 +14,7 @@ export function Sidebar() {
     mode,
     fileTree,
     selectedFile,
+    folderSkippedCount,
     isLoading,
     error,
     isSupported,
@@ -95,11 +96,19 @@ export function Sidebar() {
             </Button>
           </div>
         ) : fileTree ? (
-          <FileTree
-            tree={fileTree}
-            selectedPath={selectedFile?.path ?? null}
-            onSelectFile={selectFile}
-          />
+          <div className="min-h-0">
+            {folderSkippedCount > 0 ? (
+              <p className="border-b border-border px-3 py-2 text-[10px] leading-4 text-muted-foreground">
+                Skipped {folderSkippedCount.toLocaleString()} entries such as
+                node_modules, .git, and binary files.
+              </p>
+            ) : null}
+            <FileTree
+              tree={fileTree}
+              selectedPath={selectedFile?.path ?? null}
+              onSelectFile={selectFile}
+            />
+          </div>
         ) : (
           <EmptyState
             icon={FolderTree}

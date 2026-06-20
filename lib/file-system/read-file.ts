@@ -1,18 +1,11 @@
 import { MAX_FILE_SIZE_BYTES } from "@/lib/file-system/constants";
+import { formatFileSize } from "@/lib/file-system/format-bytes";
 import { getLanguageFromPath } from "@/lib/file-system/language-map";
 import {
   FileSystemAccessError,
   type FileContentResult,
   type FileNode,
 } from "@/lib/file-system/types";
-
-function formatFileSize(bytes: number): string {
-  if (bytes < 1024) {
-    return `${bytes} B`;
-  }
-
-  return `${(bytes / 1024).toFixed(1)} KB`;
-}
 
 export async function readFileContent(
   handle: FileSystemFileHandle

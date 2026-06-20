@@ -1,5 +1,8 @@
 export const MAX_FILE_SIZE_BYTES = 100 * 1024;
 
+/** Total readable project size allowed when opening a local folder. */
+export const MAX_PROJECT_TOTAL_BYTES = 500 * 1024;
+
 export const SKIP_DIRECTORY_NAMES = new Set([
   "node_modules",
   ".git",

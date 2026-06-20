@@ -1,6 +1,11 @@
 import {
+  MAX_PROJECT_TOTAL_BYTES,
+} from "@/lib/file-system/constants";
+import { formatFileSize } from "@/lib/file-system/format-bytes";
+import {
   FileSystemAccessError,
   type FileNode,
+  type FolderScanResult,
 } from "@/lib/file-system/types";
 import { shouldSkipEntry } from "@/lib/file-system/skip-rules";
 
@@ -34,6 +39,11 @@ export async function pickLocalFolder(): Promise<FileSystemDirectoryHandle> {
   }
 }
 
+type FolderScanState = {
+  totalReadableBytes: number;
+  skippedEntryCount: number;
+};
+
 function sortFileNodes(nodes: FileNode[]): FileNode[] {
   return nodes.sort((a, b) => {
     if (a.type !== b.type) {
@@ -44,21 +54,36 @@ function sortFileNodes(nodes: FileNode[]): FileNode[] {
   });
 }
 
+function assertProjectWithinLimit(totalReadableBytes: number): void {
+  if (totalReadableBytes > MAX_PROJECT_TOTAL_BYTES) {
+    throw new FileSystemAccessError(
+      "project-too-large",
+      `Project is too large (${formatFileSize(totalReadableBytes)}). Maximum total readable size is ${formatFileSize(MAX_PROJECT_TOTAL_BYTES)}. Try a smaller folder.`
+    );
+  }
+}
+
 async function readDirectoryHandle(
   handle: FileSystemDirectoryHandle,
-  basePath: string
+  basePath: string,
+  scanState: FolderScanState
 ): Promise<FileNode[]> {
   const children: FileNode[] = [];
 
   try {
     for await (const [name, entryHandle] of handle.entries()) {
       if (shouldSkipEntry(name, entryHandle.kind)) {
+        scanState.skippedEntryCount += 1;
         continue;
       }
 
       const path = basePath ? `${basePath}/${name}` : name;
 
       if (entryHandle.kind === "file") {
+        const file = await entryHandle.getFile();
+        scanState.totalReadableBytes += file.size;
+        assertProjectWithinLimit(scanState.totalReadableBytes);
+
         children.push({
           name,
           type: "file",
@@ -68,7 +93,11 @@ async function readDirectoryHandle(
         continue;
       }
 
-      const nestedChildren = await readDirectoryHandle(entryHandle, path);
+      const nestedChildren = await readDirectoryHandle(
+        entryHandle,
+        path,
+        scanState
+      );
 
       children.push({
         name,
@@ -79,6 +108,10 @@ async function readDirectoryHandle(
       });
     }
   } catch (error) {
+    if (error instanceof FileSystemAccessError) {
+      throw error;
+    }
+
     throw new FileSystemAccessError(
       "read-failed",
       "Failed to read the selected folder.",
@@ -91,19 +124,27 @@ async function readDirectoryHandle(
 
 export async function buildFileTreeFromDirectory(
   handle: FileSystemDirectoryHandle
-): Promise<FileNode> {
-  const children = await readDirectoryHandle(handle, "");
+): Promise<FolderScanResult> {
+  const scanState: FolderScanState = {
+    totalReadableBytes: 0,
+    skippedEntryCount: 0,
+  };
+  const children = await readDirectoryHandle(handle, "", scanState);
 
   return {
-    name: handle.name,
-    type: "folder",
-    path: "",
-    handle,
-    children,
+    tree: {
+      name: handle.name,
+      type: "folder",
+      path: "",
+      handle,
+      children,
+    },
+    skippedEntryCount: scanState.skippedEntryCount,
+    totalReadableBytes: scanState.totalReadableBytes,
   };
 }
 
-export async function pickAndBuildFileTree(): Promise<FileNode> {
+export async function pickAndBuildFileTree(): Promise<FolderScanResult> {
   const handle = await pickLocalFolder();
   return buildFileTreeFromDirectory(handle);
 }

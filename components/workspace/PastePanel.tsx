@@ -1,6 +1,7 @@
 "use client";
 
 import { MAX_FILE_SIZE_BYTES } from "@/lib/file-system/constants";
+import { formatFileSize } from "@/lib/file-system/format-bytes";
 import { PASTE_LANGUAGE_OPTIONS } from "@/components/workspace/types";
 import { useWorkspace } from "@/components/workspace/WorkspaceProvider";
 
@@ -34,8 +35,7 @@ export function PastePanel() {
             isOverLimit ? "text-destructive" : "text-muted-foreground"
           }`}
         >
-          {byteLength.toLocaleString()} / {MAX_FILE_SIZE_BYTES.toLocaleString()}{" "}
-          bytes
+          {formatFileSize(byteLength)} / {formatFileSize(MAX_FILE_SIZE_BYTES)}
         </span>
       </div>
 
@@ -49,7 +49,8 @@ export function PastePanel() {
 
       {isOverLimit ? (
         <p className="shrink-0 border-t border-border px-4 py-2 text-xs text-destructive">
-          Snippet exceeds the 100KB limit. Shorten the code before analyzing.
+          Snippet exceeds the {formatFileSize(MAX_FILE_SIZE_BYTES)} limit.
+          Shorten the code before analyzing.
         </p>
       ) : null}
     </div>

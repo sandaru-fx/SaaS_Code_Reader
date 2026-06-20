@@ -12,7 +12,14 @@ export type FileSystemErrorCode =
   | "unsupported"
   | "aborted"
   | "read-failed"
-  | "file-too-large";
+  | "file-too-large"
+  | "project-too-large";
+
+export type FolderScanResult = {
+  tree: FileNode;
+  skippedEntryCount: number;
+  totalReadableBytes: number;
+};
 
 export type FileContentResult = {
   name: string;

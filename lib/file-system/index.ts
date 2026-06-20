@@ -1,8 +1,10 @@
 export {
   BINARY_FILE_EXTENSIONS,
   MAX_FILE_SIZE_BYTES,
+  MAX_PROJECT_TOTAL_BYTES,
   SKIP_DIRECTORY_NAMES,
 } from "@/lib/file-system/constants";
+export { formatFileSize } from "@/lib/file-system/format-bytes";
 export {
   getLanguageFromFileName,
   getLanguageFromPath,
@@ -26,5 +28,6 @@ export {
   type FileContentResult,
   type FileNode,
   type FileNodeType,
+  type FolderScanResult,
   type FileSystemErrorCode,
 } from "@/lib/file-system/types";
