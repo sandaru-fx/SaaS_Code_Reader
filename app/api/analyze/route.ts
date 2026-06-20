@@ -86,7 +86,8 @@ export async function POST(request: Request) {
     }
 
     const errorResponse: AnalyzeErrorResponse = {
-      error: "Something went wrong while analyzing the code.",
+      error:
+        "AI analysis is temporarily unavailable. Please try again in a moment.",
     };
     return NextResponse.json(errorResponse, { status: 500 });
   }

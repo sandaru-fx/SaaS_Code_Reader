@@ -30,14 +30,22 @@ function normalizeLanguage(language: string): string {
 }
 
 export function CodeBlock({ content, language }: CodeBlockProps) {
+  return (
+    <CodeBlockContent
+      key={`${language}:${content}`}
+      content={content}
+      language={language}
+    />
+  );
+}
+
+function CodeBlockContent({ content, language }: CodeBlockProps) {
   const [html, setHtml] = useState<string | null>(null);
   const [isHighlighting, setIsHighlighting] = useState(true);
   const lines = content.length > 0 ? content.split("\n") : [""];
 
   useEffect(() => {
     let cancelled = false;
-    setHtml(null);
-    setIsHighlighting(true);
 
     async function highlight() {
       const { codeToHtml } = await import("shiki");

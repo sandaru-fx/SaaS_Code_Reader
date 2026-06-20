@@ -1,24 +1,19 @@
 "use client";
 
-import { AlertCircle, GitBranch, Loader2, Sparkles } from "lucide-react";
+import { AlertCircle, GitBranch, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EmptyState } from "@/components/workspace/EmptyState";
+import {
+  DiagramPanelSkeleton,
+  ExplanationPanelSkeleton,
+} from "@/components/workspace/LoadingSkeletons";
 import { MarkdownExplanation } from "@/components/workspace/MarkdownExplanation";
 import { MermaidDiagram } from "@/components/workspace/MermaidDiagram";
 import { useWorkspace } from "@/components/workspace/WorkspaceProvider";
-
-function AnalysisLoadingState({ message }: { message: string }) {
-  return (
-    <div className="flex min-h-[320px] flex-col items-center justify-center gap-2 p-6 text-center">
-      <Loader2 className="size-8 animate-spin text-muted-foreground/60" />
-      <p className="text-sm text-muted-foreground">{message}</p>
-    </div>
-  );
-}
 
 function AnalysisErrorState({
   message,
@@ -70,7 +65,7 @@ export function AiPanel() {
         >
           <ScrollArea className="h-full">
             {isAnalyzing ? (
-              <AnalysisLoadingState message="Generating flowchart..." />
+              <DiagramPanelSkeleton />
             ) : analysisError ? (
               <AnalysisErrorState
                 message={analysisError}
@@ -100,7 +95,7 @@ export function AiPanel() {
         >
           <ScrollArea className="h-full">
             {isAnalyzing ? (
-              <AnalysisLoadingState message="Writing explanation..." />
+              <ExplanationPanelSkeleton />
             ) : analysisError ? (
               <AnalysisErrorState
                 message={analysisError}

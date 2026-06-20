@@ -1,4 +1,5 @@
 export { MOCK_ANALYZE_RESPONSE, MAX_ANALYZE_CODE_BYTES } from "@/lib/ai/constants";
+export { getAnalyzeErrorMessage } from "@/lib/ai/get-analyze-error-message";
 export { analyzeCode } from "@/lib/ai/analyze-code";
 export { GeminiError, isGeminiError, type GeminiErrorCode } from "@/lib/ai/errors";
 export { GEMINI_MODEL, getGeminiModel } from "@/lib/ai/gemini";

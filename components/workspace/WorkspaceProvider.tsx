@@ -10,6 +10,7 @@ import {
 } from "react";
 
 import type { AnalyzeResponseBody } from "@/lib/ai/types";
+import { getAnalyzeErrorMessage } from "@/lib/ai/get-analyze-error-message";
 import { getPasteSnippetFileName } from "@/components/workspace/paste-utils";
 import {
   DEFAULT_PASTE_LANGUAGE,
@@ -313,16 +314,8 @@ export function WorkspaceProvider({
         | { error?: string };
 
       if (!response.ok) {
-        if (response.status === 401) {
-          setAnalysisError("Please sign in to analyze code.");
-          return;
-        }
-
-        setAnalysisError(
-          "error" in data && data.error
-            ? data.error
-            : "Analysis failed. Please try again."
-        );
+        const serverError = "error" in data ? data.error : undefined;
+        setAnalysisError(getAnalyzeErrorMessage(response.status, serverError));
         return;
       }
 

@@ -1,12 +1,13 @@
 "use client";
 
-import { AlertCircle, ClipboardPaste, FolderTree, Loader2 } from "lucide-react";
+import { AlertCircle, ClipboardPaste, FolderTree } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { EmptyState } from "@/components/workspace/EmptyState";
 import { FileTree } from "@/components/workspace/FileTree";
+import { FileTreeSkeleton } from "@/components/workspace/LoadingSkeletons";
 import { useWorkspace } from "@/components/workspace/WorkspaceProvider";
 
 export function Sidebar() {
@@ -83,10 +84,7 @@ export function Sidebar() {
             className="min-h-[280px]"
           />
         ) : isLoading ? (
-          <div className="flex min-h-[280px] flex-col items-center justify-center gap-2 p-6 text-center">
-            <Loader2 className="size-8 animate-spin text-muted-foreground/60" />
-            <p className="text-sm text-muted-foreground">Reading folder...</p>
-          </div>
+          <FileTreeSkeleton />
         ) : error ? (
           <div className="flex min-h-[280px] flex-col items-center justify-center gap-3 p-6 text-center">
             <AlertCircle className="size-8 text-destructive/70" />

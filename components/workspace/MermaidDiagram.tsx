@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { AlertCircle, Loader2 } from "lucide-react";
+import { useMemo, useState } from "react";
+import { AlertCircle } from "lucide-react";
 
 import { buildMermaidInkUrl, sanitizeMermaid } from "@/lib/mermaid";
+import { DiagramImageSkeleton } from "@/components/workspace/LoadingSkeletons";
 
 type MermaidDiagramProps = {
   mermaid: string;
@@ -43,14 +44,6 @@ function DiagramError({
 export function MermaidDiagram({ mermaid }: MermaidDiagramProps) {
   const sanitizedSource = useMemo(() => sanitizeMermaid(mermaid), [mermaid]);
   const diagram = useMemo(() => buildMermaidInkUrl(mermaid), [mermaid]);
-  const imageUrl = diagram.success ? diagram.url : null;
-  const [isImageLoading, setIsImageLoading] = useState(true);
-  const [imageError, setImageError] = useState(false);
-
-  useEffect(() => {
-    setIsImageLoading(true);
-    setImageError(false);
-  }, [imageUrl]);
 
   if (!diagram.success) {
     return (
@@ -58,39 +51,44 @@ export function MermaidDiagram({ mermaid }: MermaidDiagramProps) {
     );
   }
 
+  return (
+    <div className="space-y-3">
+      <MermaidDiagramImage key={diagram.url} url={diagram.url} />
+      <MermaidSource source={diagram.sanitized} />
+    </div>
+  );
+}
+
+function MermaidDiagramImage({ url }: { url: string }) {
+  const [isImageLoading, setIsImageLoading] = useState(true);
+  const [imageError, setImageError] = useState(false);
+
   if (imageError) {
     return (
-      <DiagramError
-        message="Diagram could not be rendered. The Mermaid syntax may be invalid."
-        source={diagram.sanitized}
-      />
+      <div className="flex min-h-[160px] flex-col items-center justify-center gap-2 rounded-lg border border-border bg-background p-4 text-center">
+        <AlertCircle className="size-6 text-destructive/70" />
+        <p className="text-sm text-destructive">
+          Diagram could not be rendered. The Mermaid syntax may be invalid.
+        </p>
+      </div>
     );
   }
 
   return (
-    <div className="space-y-3">
-      <div className="relative overflow-hidden rounded-lg border border-border bg-background">
-        {isImageLoading ? (
-          <div className="flex min-h-[200px] flex-col items-center justify-center gap-2 p-6">
-            <Loader2 className="size-6 animate-spin text-muted-foreground/60" />
-            <p className="text-xs text-muted-foreground">Rendering diagram...</p>
-          </div>
-        ) : null}
+    <div className="relative overflow-hidden rounded-lg border border-border bg-background">
+      {isImageLoading ? <DiagramImageSkeleton /> : null}
 
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={diagram.url}
-          alt="Generated architecture flowchart"
-          className={`h-auto w-full max-w-full ${isImageLoading ? "hidden" : "block"}`}
-          onLoad={() => setIsImageLoading(false)}
-          onError={() => {
-            setIsImageLoading(false);
-            setImageError(true);
-          }}
-        />
-      </div>
-
-      <MermaidSource source={diagram.sanitized} />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={url}
+        alt="Generated architecture flowchart"
+        className={`h-auto w-full max-w-full ${isImageLoading ? "hidden" : "block"}`}
+        onLoad={() => setIsImageLoading(false)}
+        onError={() => {
+          setIsImageLoading(false);
+          setImageError(true);
+        }}
+      />
     </div>
   );
 }

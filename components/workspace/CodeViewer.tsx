@@ -1,10 +1,11 @@
 "use client";
 
-import { AlertCircle, ClipboardPaste, FileCode2, Loader2 } from "lucide-react";
+import { AlertCircle, ClipboardPaste, FileCode2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { CodeBlock } from "@/components/workspace/CodeBlock";
 import { EmptyState } from "@/components/workspace/EmptyState";
+import { CodeBlockSkeleton } from "@/components/workspace/LoadingSkeletons";
 import { PastePanel } from "@/components/workspace/PastePanel";
 import { useWorkspace } from "@/components/workspace/WorkspaceProvider";
 
@@ -86,10 +87,7 @@ export function CodeViewer() {
             />
           </div>
         ) : isReadingFile ? (
-          <div className="flex flex-1 flex-col items-center justify-center gap-2">
-            <Loader2 className="size-8 animate-spin text-muted-foreground/60" />
-            <p className="text-sm text-muted-foreground">Reading file...</p>
-          </div>
+          <CodeBlockSkeleton message="Loading file content..." />
         ) : fileError ? (
           <div className="flex flex-1 flex-col items-center justify-center gap-3 p-6 text-center">
             <AlertCircle className="size-8 text-destructive/70" />
