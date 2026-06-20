@@ -7,16 +7,15 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EmptyState } from "@/components/workspace/EmptyState";
+import { MarkdownExplanation } from "@/components/workspace/MarkdownExplanation";
 import { MermaidDiagram } from "@/components/workspace/MermaidDiagram";
 import { useWorkspace } from "@/components/workspace/WorkspaceProvider";
 
-function AnalysisLoadingState() {
+function AnalysisLoadingState({ message }: { message: string }) {
   return (
     <div className="flex min-h-[320px] flex-col items-center justify-center gap-2 p-6 text-center">
       <Loader2 className="size-8 animate-spin text-muted-foreground/60" />
-      <p className="text-sm text-muted-foreground">
-        Scanning code architecture...
-      </p>
+      <p className="text-sm text-muted-foreground">{message}</p>
     </div>
   );
 }
@@ -71,7 +70,7 @@ export function AiPanel() {
         >
           <ScrollArea className="h-full">
             {isAnalyzing ? (
-              <AnalysisLoadingState />
+              <AnalysisLoadingState message="Generating flowchart..." />
             ) : analysisError ? (
               <AnalysisErrorState
                 message={analysisError}
@@ -101,7 +100,7 @@ export function AiPanel() {
         >
           <ScrollArea className="h-full">
             {isAnalyzing ? (
-              <AnalysisLoadingState />
+              <AnalysisLoadingState message="Writing explanation..." />
             ) : analysisError ? (
               <AnalysisErrorState
                 message={analysisError}
@@ -112,9 +111,7 @@ export function AiPanel() {
                 <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                   AI Explanation
                 </p>
-                <div className="rounded-lg border border-border bg-background p-3 text-sm leading-6 text-foreground/90 whitespace-pre-wrap">
-                  {analysisResult.explanation}
-                </div>
+                <MarkdownExplanation content={analysisResult.explanation} />
               </div>
             ) : (
               <EmptyState
