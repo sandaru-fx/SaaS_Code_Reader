@@ -307,6 +307,11 @@ export function WorkspaceProvider({
         | { error?: string };
 
       if (!response.ok) {
+        if (response.status === 401) {
+          setAnalysisError("Please sign in to analyze code.");
+          return;
+        }
+
         setAnalysisError(
           "error" in data && data.error
             ? data.error

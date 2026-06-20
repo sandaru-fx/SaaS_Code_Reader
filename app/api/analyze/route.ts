@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 
 import { analyzeCode } from "@/lib/ai/analyze-code";
 import { isGeminiError } from "@/lib/ai/errors";
@@ -35,6 +36,15 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const { userId } = await auth();
+
+  if (!userId) {
+    const errorResponse: AnalyzeErrorResponse = {
+      error: "Please sign in to analyze code.",
+    };
+    return NextResponse.json(errorResponse, { status: 401 });
+  }
+
   let body: unknown;
 
   try {
