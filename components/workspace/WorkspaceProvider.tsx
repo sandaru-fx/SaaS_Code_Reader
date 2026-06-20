@@ -17,12 +17,19 @@ import {
   readFileNode,
   type FileNode,
 } from "@/lib/file-system";
+import {
+  DEFAULT_PASTE_LANGUAGE,
+  type WorkspaceMode,
+} from "@/components/workspace/types";
 
 type WorkspaceContextValue = {
+  mode: WorkspaceMode;
   fileTree: FileNode | null;
   selectedFile: FileNode | null;
   fileContent: string | null;
   fileLanguage: string | null;
+  pastedCode: string;
+  pastedLanguage: string;
   analysisResult: AnalyzeResponseBody | null;
   isLoading: boolean;
   isReadingFile: boolean;
@@ -31,6 +38,10 @@ type WorkspaceContextValue = {
   fileError: string | null;
   analysisError: string | null;
   isSupported: boolean;
+  switchToFolder: () => void;
+  switchToPaste: () => void;
+  setPastedCode: (code: string) => void;
+  setPastedLanguage: (language: string) => void;
   openFolder: () => Promise<void>;
   selectFile: (node: FileNode) => Promise<void>;
   analyzeFile: () => Promise<void>;
@@ -53,6 +64,14 @@ function resetFileState(
   setFileError(null);
 }
 
+function resetPasteState(
+  setPastedCode: (value: string) => void,
+  setPastedLanguage: (value: string) => void
+) {
+  setPastedCode("");
+  setPastedLanguage(DEFAULT_PASTE_LANGUAGE);
+}
+
 function resetAnalysisState(
   setAnalysisResult: (value: AnalyzeResponseBody | null) => void,
   setAnalysisError: (value: string | null) => void
@@ -66,10 +85,13 @@ export function WorkspaceProvider({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const [mode, setMode] = useState<WorkspaceMode>("folder");
   const [fileTree, setFileTree] = useState<FileNode | null>(null);
   const [selectedFile, setSelectedFile] = useState<FileNode | null>(null);
   const [fileContent, setFileContent] = useState<string | null>(null);
   const [fileLanguage, setFileLanguage] = useState<string | null>(null);
+  const [pastedCode, setPastedCode] = useState("");
+  const [pastedLanguage, setPastedLanguage] = useState(DEFAULT_PASTE_LANGUAGE);
   const [analysisResult, setAnalysisResult] = useState<AnalyzeResponseBody | null>(
     null
   );
@@ -82,6 +104,19 @@ export function WorkspaceProvider({
   const readingPathRef = useRef<string | null>(null);
   const isSupported = useMemo(() => isFileSystemAccessSupported(), []);
 
+  const switchToFolder = useCallback(() => {
+    setMode("folder");
+    resetPasteState(setPastedCode, setPastedLanguage);
+    resetAnalysisState(setAnalysisResult, setAnalysisError);
+  }, []);
+
+  const switchToPaste = useCallback(() => {
+    setMode("paste");
+    resetFileState(setSelectedFile, setFileContent, setFileLanguage, setFileError);
+    readingPathRef.current = null;
+    resetAnalysisState(setAnalysisResult, setAnalysisError);
+  }, []);
+
   const openFolder = useCallback(async () => {
     if (!isSupported) {
       setError(
@@ -90,6 +125,8 @@ export function WorkspaceProvider({
       return;
     }
 
+    setMode("folder");
+    resetPasteState(setPastedCode, setPastedLanguage);
     setIsLoading(true);
     setError(null);
 
@@ -132,6 +169,8 @@ export function WorkspaceProvider({
       return;
     }
 
+    setMode("folder");
+    resetPasteState(setPastedCode, setPastedLanguage);
     readingPathRef.current = node.path;
     setSelectedFile(node);
     setIsReadingFile(true);
@@ -217,10 +256,13 @@ export function WorkspaceProvider({
 
   const value = useMemo(
     () => ({
+      mode,
       fileTree,
       selectedFile,
       fileContent,
       fileLanguage,
+      pastedCode,
+      pastedLanguage,
       analysisResult,
       isLoading,
       isReadingFile,
@@ -229,6 +271,10 @@ export function WorkspaceProvider({
       fileError,
       analysisError,
       isSupported,
+      switchToFolder,
+      switchToPaste,
+      setPastedCode,
+      setPastedLanguage,
       openFolder,
       selectFile,
       analyzeFile,
@@ -237,10 +283,13 @@ export function WorkspaceProvider({
       dismissAnalysisError,
     }),
     [
+      mode,
       fileTree,
       selectedFile,
       fileContent,
       fileLanguage,
+      pastedCode,
+      pastedLanguage,
       analysisResult,
       isLoading,
       isReadingFile,
@@ -249,6 +298,8 @@ export function WorkspaceProvider({
       fileError,
       analysisError,
       isSupported,
+      switchToFolder,
+      switchToPaste,
       openFolder,
       selectFile,
       analyzeFile,
