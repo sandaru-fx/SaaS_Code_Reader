@@ -7,6 +7,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EmptyState } from "@/components/workspace/EmptyState";
+import { MermaidDiagram } from "@/components/workspace/MermaidDiagram";
 import { useWorkspace } from "@/components/workspace/WorkspaceProvider";
 
 function AnalysisLoadingState() {
@@ -79,14 +80,9 @@ export function AiPanel() {
             ) : analysisResult ? (
               <div className="space-y-3 p-4">
                 <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  Mermaid Diagram
+                  Architecture Flowchart
                 </p>
-                <pre className="overflow-x-auto rounded-lg border border-border bg-background p-3 font-mono text-[11px] leading-5 text-foreground/90">
-                  {analysisResult.mermaid}
-                </pre>
-                <p className="text-xs text-muted-foreground">
-                  Visual diagram rendering arrives on Day 5.
-                </p>
+                <MermaidDiagram mermaid={analysisResult.mermaid} />
               </div>
             ) : (
               <EmptyState
