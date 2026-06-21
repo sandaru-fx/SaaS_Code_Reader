@@ -69,6 +69,8 @@ lib/                  # Utilities
 - [x] Guardrails, loading UX, and error handling
 - [x] Production deployment (Vercel)
 - [x] Launch polish (SEO, privacy, landing)
+- [x] Marketing kit + launch playbook (`docs/launch/`)
+- [x] **10-day MVP complete** — see [docs/MVP_COMPLETE.md](./docs/MVP_COMPLETE.md)
 
 ## Production
 
@@ -77,6 +79,10 @@ lib/                  # Utilities
 - **Privacy:** [coderider.vercel.app/privacy](https://coderider.vercel.app/privacy)
 
 To enable auth on production, add Clerk API keys in Vercel environment variables and allow `coderider.vercel.app` in the Clerk dashboard.
+
+## Launch kit
+
+Copy-paste marketing content for social posts and Product Hunt: [`docs/launch/`](./docs/launch/)
 
 ## Scripts
 
