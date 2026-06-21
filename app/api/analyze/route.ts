@@ -13,6 +13,9 @@ import {
   validateAnalyzeRequest,
 } from "@/lib/ai/validate-request";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { saveAnalysis } from "@/lib/supabase/analyses";
+import { getAnalysisOwner } from "@/lib/supabase/owner";
+import { isSupabaseConfigured } from "@/lib/supabase/is-configured";
 
 function geminiErrorStatus(code: string): number {
   switch (code) {
@@ -96,6 +99,21 @@ export async function POST(request: Request) {
 
   try {
     const analysis = await analyzeCode(validation.data);
+
+    if (isSupabaseConfigured()) {
+      const owner = await getAnalysisOwner(request);
+
+      await saveAnalysis({
+        userId: owner.userId,
+        sessionId: owner.sessionId,
+        fileName: validation.data.fileName,
+        language: validation.data.language,
+        code: validation.data.code,
+        explanation: analysis.explanation,
+        mermaid: analysis.mermaid,
+      });
+    }
+
     return NextResponse.json(analysis);
   } catch (error) {
     if (isGeminiError(error)) {

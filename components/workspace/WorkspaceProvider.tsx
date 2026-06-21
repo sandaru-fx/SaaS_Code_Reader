@@ -25,9 +25,17 @@ import {
 } from "@/lib/file-system";
 import { MAX_FILE_SIZE_BYTES } from "@/lib/file-system/constants";
 import { formatFileSize } from "@/lib/file-system/format-bytes";
+import {
+  getOrCreateSessionId,
+  SESSION_ID_HEADER,
+} from "@/lib/session/client-id";
+import type { AnalysisHistoryItem } from "@/lib/supabase/types";
+
+type SidebarTab = "explorer" | "history";
 
 type WorkspaceContextValue = {
   mode: WorkspaceMode;
+  sidebarTab: SidebarTab;
   fileTree: FileNode | null;
   selectedFile: FileNode | null;
   fileContent: string | null;
@@ -35,6 +43,10 @@ type WorkspaceContextValue = {
   pastedCode: string;
   pastedLanguage: string;
   analysisResult: AnalyzeResponseBody | null;
+  historyItems: AnalysisHistoryItem[];
+  activeHistoryId: string | null;
+  isHistoryLoading: boolean;
+  isDeletingHistoryId: string | null;
   isLoading: boolean;
   isReadingFile: boolean;
   isAnalyzing: boolean;
@@ -46,11 +58,15 @@ type WorkspaceContextValue = {
   isSupported: boolean;
   switchToFolder: () => void;
   switchToPaste: () => void;
+  setSidebarTab: (tab: SidebarTab) => void;
   setPastedCode: (code: string) => void;
   setPastedLanguage: (language: string) => void;
   openFolder: () => Promise<void>;
   selectFile: (node: FileNode) => Promise<void>;
   analyzeFile: () => Promise<void>;
+  loadHistoryItem: (id: string) => Promise<void>;
+  deleteHistoryItem: (id: string) => Promise<void>;
+  refreshHistory: () => Promise<void>;
   dismissError: () => void;
   dismissFileError: () => void;
   dismissAnalysisError: () => void;
@@ -90,6 +106,12 @@ function getPasteByteLength(code: string): number {
   return new TextEncoder().encode(code).length;
 }
 
+function getHistoryHeaders(): HeadersInit {
+  return {
+    [SESSION_ID_HEADER]: getOrCreateSessionId(),
+  };
+}
+
 export function WorkspaceProvider({
   children,
   initialMode = "folder",
@@ -98,6 +120,7 @@ export function WorkspaceProvider({
   initialMode?: WorkspaceMode;
 }>) {
   const [mode, setMode] = useState<WorkspaceMode>(initialMode);
+  const [sidebarTab, setSidebarTab] = useState<SidebarTab>("explorer");
   const [fileTree, setFileTree] = useState<FileNode | null>(null);
   const [selectedFile, setSelectedFile] = useState<FileNode | null>(null);
   const [fileContent, setFileContent] = useState<string | null>(null);
@@ -105,6 +128,12 @@ export function WorkspaceProvider({
   const [pastedCode, setPastedCode] = useState("");
   const [pastedLanguage, setPastedLanguage] = useState(DEFAULT_PASTE_LANGUAGE);
   const [analysisResult, setAnalysisResult] = useState<AnalyzeResponseBody | null>(
+    null
+  );
+  const [historyItems, setHistoryItems] = useState<AnalysisHistoryItem[]>([]);
+  const [activeHistoryId, setActiveHistoryId] = useState<string | null>(null);
+  const [isHistoryLoading, setIsHistoryLoading] = useState(false);
+  const [isDeletingHistoryId, setIsDeletingHistoryId] = useState<string | null>(
     null
   );
   const [isLoading, setIsLoading] = useState(false);
@@ -217,6 +246,119 @@ export function WorkspaceProvider({
     setAnalysisError(null);
   }, []);
 
+  const refreshHistory = useCallback(async () => {
+    setIsHistoryLoading(true);
+
+    try {
+      const response = await fetch("/api/history", {
+        headers: getHistoryHeaders(),
+      });
+
+      if (!response.ok) {
+        return;
+      }
+
+      const data = (await response.json()) as { items?: AnalysisHistoryItem[] };
+      setHistoryItems(Array.isArray(data.items) ? data.items : []);
+    } catch {
+      // History is optional — ignore network failures silently.
+    } finally {
+      setIsHistoryLoading(false);
+    }
+  }, []);
+
+  const updateSidebarTab = useCallback(
+    (tab: SidebarTab) => {
+      setSidebarTab(tab);
+
+      if (tab === "history") {
+        void refreshHistory();
+      }
+    },
+    [refreshHistory]
+  );
+
+  const loadHistoryItem = useCallback(async (id: string) => {
+    setAnalysisError(null);
+
+    try {
+      const response = await fetch(`/api/history/${id}`, {
+        headers: getHistoryHeaders(),
+      });
+
+      const data = (await response.json()) as
+        | {
+            code?: string;
+            language?: string;
+            explanation?: string;
+            mermaid?: string;
+            fileName?: string | null;
+            error?: string;
+          }
+        | { error?: string };
+
+      if (!response.ok) {
+        const serverError = "error" in data ? data.error : undefined;
+        setAnalysisError(serverError ?? "Could not load saved analysis.");
+        return;
+      }
+
+      if (
+        !("code" in data) ||
+        !("language" in data) ||
+        !("explanation" in data) ||
+        !("mermaid" in data)
+      ) {
+        setAnalysisError("Saved analysis returned an invalid response.");
+        return;
+      }
+
+      setMode("paste");
+      setSidebarTab("history");
+      resetFileState(setSelectedFile, setFileContent, setFileLanguage, setFileError);
+      readingPathRef.current = null;
+      setPastedCode(data.code ?? "");
+      setPastedLanguage(data.language ?? DEFAULT_PASTE_LANGUAGE);
+      setAnalysisResult({
+        explanation: data.explanation ?? "",
+        mermaid: data.mermaid ?? "",
+      });
+      setActiveHistoryId(id);
+    } catch {
+      setAnalysisError("Network error while loading saved analysis.");
+    }
+  }, []);
+
+  const deleteHistoryItem = useCallback(
+    async (id: string) => {
+      setIsDeletingHistoryId(id);
+
+      try {
+        const response = await fetch("/api/history", {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            ...getHistoryHeaders(),
+          },
+          body: JSON.stringify({ id }),
+        });
+
+        if (!response.ok) {
+          return;
+        }
+
+        setHistoryItems((current) => current.filter((item) => item.id !== id));
+
+        if (activeHistoryId === id) {
+          setActiveHistoryId(null);
+        }
+      } finally {
+        setIsDeletingHistoryId(null);
+      }
+    },
+    [activeHistoryId]
+  );
+
   const selectFile = useCallback(async (node: FileNode) => {
     if (node.type !== "file") {
       return;
@@ -301,6 +443,7 @@ export function WorkspaceProvider({
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          ...getHistoryHeaders(),
         },
         body: JSON.stringify({
           code,
@@ -325,6 +468,8 @@ export function WorkspaceProvider({
       }
 
       setAnalysisResult(data);
+      setActiveHistoryId(null);
+      void refreshHistory();
     } catch {
       setAnalysisError(
         mode === "paste"
@@ -342,11 +487,13 @@ export function WorkspaceProvider({
     selectedFile,
     fileContent,
     fileLanguage,
+    refreshHistory,
   ]);
 
   const value = useMemo(
     () => ({
       mode,
+      sidebarTab,
       fileTree,
       selectedFile,
       fileContent,
@@ -354,6 +501,10 @@ export function WorkspaceProvider({
       pastedCode,
       pastedLanguage,
       analysisResult,
+      historyItems,
+      activeHistoryId,
+      isHistoryLoading,
+      isDeletingHistoryId,
       isLoading,
       isReadingFile,
       isAnalyzing,
@@ -365,17 +516,22 @@ export function WorkspaceProvider({
       isSupported,
       switchToFolder,
       switchToPaste,
+      setSidebarTab: updateSidebarTab,
       setPastedCode: updatePastedCode,
       setPastedLanguage: updatePastedLanguage,
       openFolder,
       selectFile,
       analyzeFile,
+      loadHistoryItem,
+      deleteHistoryItem,
+      refreshHistory,
       dismissError,
       dismissFileError,
       dismissAnalysisError,
     }),
     [
       mode,
+      sidebarTab,
       fileTree,
       selectedFile,
       fileContent,
@@ -383,6 +539,10 @@ export function WorkspaceProvider({
       pastedCode,
       pastedLanguage,
       analysisResult,
+      historyItems,
+      activeHistoryId,
+      isHistoryLoading,
+      isDeletingHistoryId,
       isLoading,
       isReadingFile,
       isAnalyzing,
@@ -394,11 +554,15 @@ export function WorkspaceProvider({
       isSupported,
       switchToFolder,
       switchToPaste,
+      updateSidebarTab,
       updatePastedCode,
       updatePastedLanguage,
       openFolder,
       selectFile,
       analyzeFile,
+      loadHistoryItem,
+      deleteHistoryItem,
+      refreshHistory,
       dismissError,
       dismissFileError,
       dismissAnalysisError,
