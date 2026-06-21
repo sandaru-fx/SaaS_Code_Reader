@@ -12,6 +12,7 @@ import {
   isGeminiConfigured,
   validateAnalyzeRequest,
 } from "@/lib/ai/validate-request";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 function geminiErrorStatus(code: string): number {
   switch (code) {
@@ -37,6 +38,24 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  // Rate limiting — applied before auth to block bots early
+  const ip = getClientIp(request);
+  const rateLimit = checkRateLimit(ip);
+
+  if (!rateLimit.allowed) {
+    const errorResponse: AnalyzeErrorResponse = {
+      error: `Too many requests. Please wait ${rateLimit.retryAfterSeconds} seconds before trying again.`,
+    };
+    return NextResponse.json(errorResponse, {
+      status: 429,
+      headers: {
+        "Retry-After": String(rateLimit.retryAfterSeconds),
+        "X-RateLimit-Limit": "10",
+        "X-RateLimit-Remaining": "0",
+      },
+    });
+  }
+
   if (isClerkConfigured()) {
     const { userId } = await auth();
 
