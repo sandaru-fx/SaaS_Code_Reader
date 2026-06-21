@@ -27,9 +27,21 @@ function mapGeminiFailure(error: unknown): GeminiError {
   }
 
   if (
-    message.includes("fetch") ||
-    message.includes("network") ||
-    message.includes("econnreset")
+    message.includes("not found") ||
+    message.includes("404") ||
+    message.includes("is not supported for generatecontent")
+  ) {
+    return new GeminiError(
+      "generation-failed",
+      "The configured AI model is unavailable. Please try again later."
+    );
+  }
+
+  if (
+    message.includes("econnreset") ||
+    message.includes("enotfound") ||
+    message.includes("etimedout") ||
+    message.includes("network request failed")
   ) {
     return new GeminiError(
       "network-error",

@@ -2,7 +2,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 import { GeminiError } from "@/lib/ai/errors";
 
-export const GEMINI_MODEL = "gemini-1.5-flash";
+export const GEMINI_MODEL = "gemini-2.5-flash";
 
 type GeminiModelOptions = {
   systemInstruction?: string;
