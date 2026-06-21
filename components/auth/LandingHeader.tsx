@@ -4,8 +4,24 @@ import Link from "next/link";
 import { useAuth, UserButton } from "@clerk/nextjs";
 
 import { Button } from "@/components/ui/button";
+import { isClerkPublishableKeySet } from "@/lib/clerk/is-configured";
 
 export function LandingHeader() {
+  if (!isClerkPublishableKeySet()) {
+    return (
+      <header className="flex items-center justify-between border-b border-border px-6 py-4">
+        <span className="text-sm font-semibold tracking-tight">CodeRider</span>
+        <Button variant="outline" size="sm" render={<Link href="/workspace" />}>
+          Open Workspace
+        </Button>
+      </header>
+    );
+  }
+
+  return <LandingHeaderWithAuth />;
+}
+
+function LandingHeaderWithAuth() {
   const { isLoaded, isSignedIn } = useAuth();
 
   return (

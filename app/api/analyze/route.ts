@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 
 import { analyzeCode } from "@/lib/ai/analyze-code";
+import { isClerkConfigured } from "@/lib/clerk/is-configured";
 import { isGeminiError } from "@/lib/ai/errors";
 import type {
   AnalyzeErrorResponse,
@@ -36,13 +37,15 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const { userId } = await auth();
+  if (isClerkConfigured()) {
+    const { userId } = await auth();
 
-  if (!userId) {
-    const errorResponse: AnalyzeErrorResponse = {
-      error: "Please sign in to analyze code.",
-    };
-    return NextResponse.json(errorResponse, { status: 401 });
+    if (!userId) {
+      const errorResponse: AnalyzeErrorResponse = {
+        error: "Please sign in to analyze code.",
+      };
+      return NextResponse.json(errorResponse, { status: 401 });
+    }
   }
 
   let body: unknown;

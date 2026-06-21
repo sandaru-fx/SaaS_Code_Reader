@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { SignIn } from "@clerk/nextjs";
+
+import { isClerkPublishableKeySet } from "@/lib/clerk/is-configured";
 
 export const metadata: Metadata = {
   title: "Sign In",
@@ -7,6 +10,10 @@ export const metadata: Metadata = {
 };
 
 export default function SignInPage() {
+  if (!isClerkPublishableKeySet()) {
+    redirect("/workspace");
+  }
+
   return (
     <div className="flex min-h-full flex-1 items-center justify-center px-6 py-16">
       <SignIn
