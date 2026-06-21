@@ -21,12 +21,14 @@ export function WorkspaceLayout() {
   return (
     <WorkspaceProvider initialMode={initialMode}>
       <WorkspaceErrorBoundary>
-        <div className="flex h-screen flex-col overflow-hidden">
-          <TopBar />
-          <div className="flex min-h-0 flex-1 overflow-hidden">
-            <Sidebar />
-            <CodeViewer />
-            <AiPanel />
+        <div className="flex h-screen flex-col overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.12),transparent_30%),linear-gradient(180deg,#f8fafc,#eef2f7)] p-3">
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[1.5rem] border border-white bg-white/90 shadow-2xl shadow-slate-950/10 backdrop-blur">
+            <TopBar />
+            <div className="flex min-h-0 flex-1 overflow-hidden bg-slate-50/70">
+              <Sidebar />
+              <CodeViewer />
+              <AiPanel />
+            </div>
           </div>
         </div>
       </WorkspaceErrorBoundary>

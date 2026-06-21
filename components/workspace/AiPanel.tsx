@@ -42,10 +42,10 @@ export function AiPanel() {
   } = useWorkspace();
 
   return (
-    <aside className="flex h-full min-h-0 w-[350px] shrink-0 flex-col border-l border-border bg-muted/30">
+    <aside className="flex h-full min-h-0 w-[390px] shrink-0 flex-col border-l border-slate-200 bg-white">
       <Tabs defaultValue="diagram" className="flex h-full min-h-0 flex-col gap-0">
-        <div className="flex h-10 shrink-0 items-center bg-background/50 px-3">
-          <TabsList className="h-8 w-full">
+        <div className="flex h-14 shrink-0 items-center bg-white px-4">
+          <TabsList className="h-9 w-full rounded-full bg-slate-100 p-1">
             <TabsTrigger value="diagram" className="flex-1">
               <GitBranch className="size-3.5" />
               Diagram
@@ -72,10 +72,15 @@ export function AiPanel() {
                 onDismiss={dismissAnalysisError}
               />
             ) : analysisResult ? (
-              <div className="space-y-3 p-4">
-                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  Architecture Flowchart
-                </p>
+              <div className="space-y-4 p-5">
+                <div>
+                  <p className="text-sm font-semibold text-slate-900">
+                    Architecture Flowchart
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    Generated from the selected code context
+                  </p>
+                </div>
                 <MermaidDiagram mermaid={analysisResult.mermaid} />
               </div>
             ) : (
@@ -102,10 +107,15 @@ export function AiPanel() {
                 onDismiss={dismissAnalysisError}
               />
             ) : analysisResult ? (
-              <div className="space-y-3 p-4">
-                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  AI Explanation
-                </p>
+              <div className="space-y-4 p-5">
+                <div>
+                  <p className="text-sm font-semibold text-slate-900">
+                    AI Explanation
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    Step-by-step walkthrough of the logic
+                  </p>
+                </div>
                 <MarkdownExplanation content={analysisResult.explanation} />
               </div>
             ) : (

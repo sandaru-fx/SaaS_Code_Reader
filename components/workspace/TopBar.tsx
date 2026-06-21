@@ -2,7 +2,13 @@
 
 import Link from "next/link";
 import { UserButton } from "@clerk/nextjs";
-import { ClipboardPaste, FolderOpen, Loader2, Sparkles } from "lucide-react";
+import {
+  ClipboardPaste,
+  FolderOpen,
+  GitBranch,
+  Loader2,
+  Sparkles,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -23,24 +29,32 @@ export function TopBar() {
   } = useWorkspace();
 
   return (
-    <header className="flex h-12 shrink-0 items-center gap-3 border-b border-border bg-background px-4">
+    <header className="flex h-16 shrink-0 items-center gap-4 border-b border-slate-200/80 bg-white/95 px-4 backdrop-blur">
       <Link
         href="/"
-        className="text-sm font-semibold tracking-tight transition-opacity hover:opacity-80"
+        className="flex items-center gap-2 text-sm font-semibold tracking-tight transition-opacity hover:opacity-80"
       >
-        CodeRider
+        <span className="flex size-9 items-center justify-center rounded-2xl bg-slate-950 text-white shadow-sm">
+          <GitBranch className="size-4" />
+        </span>
+        <span>CodeRider</span>
       </Link>
 
-      <Separator orientation="vertical" className="h-4" />
+      <Separator orientation="vertical" className="h-5" />
 
-      <span className="text-xs text-muted-foreground">Workspace</span>
+      <div className="hidden flex-col sm:flex">
+        <span className="text-xs font-medium text-slate-700">Workspace</span>
+        <span className="text-[11px] text-slate-500">
+          Local code explorer and AI diagrammer
+        </span>
+      </div>
 
-      <div className="flex items-center rounded-lg border border-border bg-muted/40 p-0.5">
+      <div className="flex items-center rounded-full border border-slate-200 bg-slate-100 p-1">
         <Button
           type="button"
           variant={mode === "folder" ? "default" : "ghost"}
           size="sm"
-          className="h-7 px-2.5 text-xs"
+          className="h-8 rounded-full px-3 text-xs"
           onClick={switchToFolder}
         >
           <FolderOpen className="size-3.5" />
@@ -50,7 +64,7 @@ export function TopBar() {
           type="button"
           variant={mode === "paste" ? "default" : "ghost"}
           size="sm"
-          className="h-7 px-2.5 text-xs"
+          className="h-8 rounded-full px-3 text-xs"
           onClick={switchToPaste}
         >
           <ClipboardPaste className="size-3.5" />
@@ -63,6 +77,7 @@ export function TopBar() {
           <Button
             variant="outline"
             size="sm"
+            className="h-9 rounded-full border-slate-200 bg-white px-4 shadow-sm"
             disabled={!isSupported || isLoading}
             onClick={openFolder}
           >
@@ -70,7 +85,12 @@ export function TopBar() {
             {isLoading ? "Opening..." : "Open Folder"}
           </Button>
         ) : null}
-        <Button size="sm" disabled={!canAnalyze} onClick={analyzeFile}>
+        <Button
+          size="sm"
+          className="h-9 rounded-full px-4 shadow-sm"
+          disabled={!canAnalyze}
+          onClick={analyzeFile}
+        >
           {isAnalyzing ? <Loader2 className="animate-spin" /> : <Sparkles />}
           {isAnalyzing ? "Analyzing..." : "Analyze"}
         </Button>

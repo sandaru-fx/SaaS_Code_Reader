@@ -27,18 +27,20 @@ export function CodeViewer() {
       pastedCode.length > 0 ? pastedCode.split("\n").length : 0;
 
     return (
-      <main className="flex min-w-0 flex-1 flex-col bg-muted/20">
-        <div className="flex h-10 shrink-0 items-center gap-2 border-b border-border bg-background px-4">
-          <ClipboardPaste className="size-3.5 shrink-0 text-muted-foreground" />
-          <span className="min-w-0 flex-1 truncate font-mono text-xs text-muted-foreground">
-            Quick Paste
+      <main className="flex min-w-0 flex-1 flex-col bg-slate-50">
+        <div className="flex h-14 shrink-0 items-center gap-3 border-b border-slate-200 bg-white px-4">
+          <div className="flex size-8 items-center justify-center rounded-xl bg-blue-50">
+            <ClipboardPaste className="size-3.5 shrink-0 text-blue-600" />
+          </div>
+          <span className="min-w-0 flex-1 truncate font-mono text-xs font-medium text-slate-600">
+            untitled-snippet.{pastedLanguage}
           </span>
           {lineCount > 0 ? (
-            <span className="shrink-0 text-[10px] text-muted-foreground">
+            <span className="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-[11px] text-slate-500">
               {lineCount} {lineCount === 1 ? "line" : "lines"}
             </span>
           ) : null}
-          <span className="shrink-0 rounded-md bg-muted px-2 py-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
+          <span className="shrink-0 rounded-full bg-slate-950 px-2.5 py-1 text-[10px] uppercase tracking-wide text-white">
             {pastedLanguage}
           </span>
         </div>
@@ -56,27 +58,30 @@ export function CodeViewer() {
       : 0;
 
   return (
-    <main className="flex min-w-0 flex-1 flex-col bg-muted/20">
-      <div className="flex h-10 shrink-0 items-center gap-2 border-b border-border bg-background px-4">
+    <main className="flex min-w-0 flex-1 flex-col bg-slate-50">
+      <div className="flex h-14 shrink-0 items-center gap-3 border-b border-slate-200 bg-white px-4">
+        <div className="flex size-8 items-center justify-center rounded-xl bg-slate-100">
+          <FileCode2 className="size-3.5 text-slate-600" />
+        </div>
         <span
-          className="min-w-0 flex-1 truncate font-mono text-xs text-muted-foreground"
+          className="min-w-0 flex-1 truncate font-mono text-xs font-medium text-slate-600"
           title={selectedFile?.path}
         >
           {selectedFile ? selectedFile.path : "No file selected"}
         </span>
         {lineCount > 0 ? (
-          <span className="shrink-0 text-[10px] text-muted-foreground">
+          <span className="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-[11px] text-slate-500">
             {lineCount} {lineCount === 1 ? "line" : "lines"}
           </span>
         ) : null}
         {fileLanguage ? (
-          <span className="shrink-0 rounded-md bg-muted px-2 py-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
+          <span className="shrink-0 rounded-full bg-slate-950 px-2.5 py-1 text-[10px] uppercase tracking-wide text-white">
             {fileLanguage}
           </span>
         ) : null}
       </div>
 
-      <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-background/80">
+      <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-white/70">
         {!selectedFile ? (
           <div className="flex flex-1 items-center justify-center">
             <EmptyState

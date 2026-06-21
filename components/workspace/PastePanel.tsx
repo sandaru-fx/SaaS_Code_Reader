@@ -14,13 +14,13 @@ export function PastePanel() {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className="flex shrink-0 flex-wrap items-center gap-3 border-b border-border px-4 py-2">
-        <label className="flex items-center gap-2 text-xs text-muted-foreground">
+      <div className="flex shrink-0 flex-wrap items-center gap-3 border-b border-slate-200 bg-white/70 px-4 py-3">
+        <label className="flex items-center gap-2 text-xs font-medium text-slate-600">
           Language
           <select
             value={pastedLanguage}
             onChange={(event) => setPastedLanguage(event.target.value)}
-            className="h-8 rounded-md border border-border bg-background px-2 font-mono text-xs text-foreground capitalize"
+            className="h-9 rounded-xl border border-slate-200 bg-white px-3 font-mono text-xs text-slate-900 shadow-sm outline-none transition focus:border-slate-400"
           >
             {PASTE_LANGUAGE_OPTIONS.map((language) => (
               <option key={language} value={language}>
@@ -31,8 +31,10 @@ export function PastePanel() {
         </label>
 
         <span
-          className={`ml-auto text-[10px] ${
-            isOverLimit ? "text-destructive" : "text-muted-foreground"
+          className={`ml-auto rounded-full px-2.5 py-1 text-[11px] ${
+            isOverLimit
+              ? "bg-red-50 text-destructive"
+              : "bg-slate-100 text-slate-500"
           }`}
         >
           {formatFileSize(byteLength)} / {formatFileSize(MAX_FILE_SIZE_BYTES)}
@@ -44,7 +46,7 @@ export function PastePanel() {
         onChange={(event) => setPastedCode(event.target.value)}
         placeholder="Paste your code snippet here..."
         spellCheck={false}
-        className="min-h-0 flex-1 resize-none bg-background/80 p-4 font-mono text-sm leading-6 text-foreground outline-none placeholder:text-muted-foreground"
+        className="min-h-0 flex-1 resize-none bg-white/80 p-6 font-mono text-sm leading-7 text-slate-900 outline-none placeholder:text-slate-400"
       />
 
       {isOverLimit ? (
