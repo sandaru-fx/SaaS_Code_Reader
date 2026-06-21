@@ -7,6 +7,7 @@ import { ClipboardPaste, FolderOpen, Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useWorkspace } from "@/components/workspace/WorkspaceProvider";
+import { isClerkPublishableKeySet } from "@/lib/clerk/is-configured";
 
 export function TopBar() {
   const {
@@ -73,7 +74,7 @@ export function TopBar() {
           {isAnalyzing ? <Loader2 className="animate-spin" /> : <Sparkles />}
           {isAnalyzing ? "Analyzing..." : "Analyze"}
         </Button>
-        <UserButton />
+        {isClerkPublishableKeySet() ? <UserButton /> : null}
       </div>
     </header>
   );
