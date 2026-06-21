@@ -4,6 +4,14 @@ AI-powered visual code workspace manager for developers who want to understand c
 
 **Live demo:** [https://coderider.vercel.app](https://coderider.vercel.app)
 
+![CodeRider social preview](./public/og-image.png)
+
+## How it works
+
+1. **Open or paste code** — load a local folder or use Quick Paste mode
+2. **Click Analyze** — AI scans the logic and architecture
+3. **See the diagram** — Mermaid flowchart + plain-English explanation
+
 ## Tech Stack
 
 - **Framework:** Next.js (App Router) + TypeScript
@@ -35,6 +43,7 @@ Copy `.env.example` to `.env.local` and fill in:
 | `NEXT_PUBLIC_CLERK_SIGN_UP_URL` | Yes | `/sign-up` |
 | `NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL` | Yes | `/workspace` |
 | `NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL` | Yes | `/workspace` |
+| `NEXT_PUBLIC_SITE_URL` | Optional | Production URL for SEO metadata |
 
 Without Clerk keys, the app runs in open demo mode (workspace and analyze are accessible).
 
@@ -59,11 +68,13 @@ lib/                  # Utilities
 - [x] Clerk authentication
 - [x] Guardrails, loading UX, and error handling
 - [x] Production deployment (Vercel)
+- [x] Launch polish (SEO, privacy, landing)
 
 ## Production
 
 - **URL:** [https://coderider.vercel.app](https://coderider.vercel.app)
 - **Repo:** [github.com/sandaru-fx/SaaS_Code_Reader](https://github.com/sandaru-fx/SaaS_Code_Reader)
+- **Privacy:** [coderider.vercel.app/privacy](https://coderider.vercel.app/privacy)
 
 To enable auth on production, add Clerk API keys in Vercel environment variables and allow `coderider.vercel.app` in the Clerk dashboard.
 
