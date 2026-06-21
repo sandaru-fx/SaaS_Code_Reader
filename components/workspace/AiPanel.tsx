@@ -33,17 +33,55 @@ function AnalysisErrorState({
   );
 }
 
+function AnalysisLoadingState({ variant }: { variant: "diagram" | "explanation" }) {
+  if (variant === "diagram") {
+    return (
+      <div className="space-y-4 p-5">
+        <div>
+          <p className="text-sm font-semibold text-slate-900">
+            Generating flowchart
+          </p>
+          <p className="text-xs text-slate-500">
+            Step 1 of 2 — mapping architecture from your code
+          </p>
+        </div>
+        <DiagramPanelSkeleton />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4 p-5">
+      <div>
+        <p className="text-sm font-semibold text-slate-900">
+          Writing explanation
+        </p>
+        <p className="text-xs text-slate-500">
+          Step 2 of 2 — summarizing logic and runtime flow
+        </p>
+      </div>
+      <ExplanationPanelSkeleton />
+    </div>
+  );
+}
+
 export function AiPanel() {
   const {
     analysisResult,
     isAnalyzing,
     analysisError,
+    aiPanelTab,
+    setAiPanelTab,
     dismissAnalysisError,
   } = useWorkspace();
 
   return (
-    <aside className="flex h-full min-h-0 w-[390px] shrink-0 flex-col border-l border-slate-200 bg-white">
-      <Tabs defaultValue="diagram" className="flex h-full min-h-0 flex-col gap-0">
+    <aside className="flex h-full min-h-0 w-[min(100%,520px)] min-w-[420px] shrink-0 flex-col border-l border-slate-200 bg-white">
+      <Tabs
+        value={aiPanelTab}
+        onValueChange={(value) => setAiPanelTab(value as "diagram" | "explanation")}
+        className="flex h-full min-h-0 flex-col gap-0"
+      >
         <div className="flex h-14 shrink-0 items-center bg-white px-4">
           <TabsList className="h-9 w-full rounded-full bg-slate-100 p-1">
             <TabsTrigger value="diagram" className="flex-1">
@@ -65,7 +103,7 @@ export function AiPanel() {
         >
           <ScrollArea className="h-full">
             {isAnalyzing ? (
-              <DiagramPanelSkeleton />
+              <AnalysisLoadingState variant="diagram" />
             ) : analysisError ? (
               <AnalysisErrorState
                 message={analysisError}
@@ -78,7 +116,7 @@ export function AiPanel() {
                     Architecture Flowchart
                   </p>
                   <p className="text-xs text-slate-500">
-                    Generated from the selected code context
+                    Zoom or open fullscreen to inspect the diagram
                   </p>
                 </div>
                 <MermaidDiagram mermaid={analysisResult.mermaid} />
@@ -87,7 +125,7 @@ export function AiPanel() {
               <EmptyState
                 icon={GitBranch}
                 title="Analyze a file to generate flowchart"
-                description="Your architecture diagram will render here"
+                description="Your architecture diagram will render here with zoom and fullscreen controls"
                 className="min-h-[320px]"
               />
             )}
@@ -100,7 +138,7 @@ export function AiPanel() {
         >
           <ScrollArea className="h-full">
             {isAnalyzing ? (
-              <ExplanationPanelSkeleton />
+              <AnalysisLoadingState variant="explanation" />
             ) : analysisError ? (
               <AnalysisErrorState
                 message={analysisError}

@@ -55,22 +55,25 @@ export function FileTreeSkeleton() {
 
 export function DiagramPanelSkeleton() {
   return (
-    <div className="space-y-3 p-4">
-      <Skeleton className="h-3 w-32" />
-      <div className="rounded-lg border border-border bg-background p-4">
-        <div className="mx-auto flex max-w-[220px] flex-col items-center gap-4">
-          <Skeleton className="h-10 w-28 rounded-lg" />
+    <div className="space-y-4">
+      <div className="rounded-xl border border-slate-200 bg-white p-5">
+        <div className="mx-auto flex max-w-[280px] flex-col items-center gap-4">
+          <Skeleton className="h-12 w-32 rounded-xl" />
           <Skeleton className="h-px w-full" />
-          <div className="flex w-full justify-between gap-3">
-            <Skeleton className="h-8 w-16 rounded-lg" />
-            <Skeleton className="h-8 w-16 rounded-lg" />
+          <div className="grid w-full grid-cols-2 gap-3">
+            <Skeleton className="h-10 rounded-xl" />
+            <Skeleton className="h-10 rounded-xl" />
           </div>
-          <Skeleton className="h-10 w-24 rounded-lg" />
+          <Skeleton className="h-12 w-28 rounded-xl" />
+          <Skeleton className="h-10 w-full rounded-xl" />
         </div>
       </div>
-      <p className="text-center text-xs text-muted-foreground">
-        Generating flowchart...
-      </p>
+      <div className="flex items-center justify-center gap-2">
+        <Skeleton className="size-2 rounded-full" />
+        <p className="text-center text-xs text-slate-500">
+          Generating flowchart...
+        </p>
+      </div>
     </div>
   );
 }

@@ -8,6 +8,7 @@ import { Sidebar } from "@/components/workspace/Sidebar";
 import { TopBar } from "@/components/workspace/TopBar";
 import type { WorkspaceMode } from "@/components/workspace/types";
 import { WorkspaceErrorBoundary } from "@/components/workspace/WorkspaceErrorBoundary";
+import { AnalysisToast } from "@/components/workspace/AnalysisToast";
 import { WorkspaceProvider } from "@/components/workspace/WorkspaceProvider";
 
 function getInitialMode(modeParam: string | null): WorkspaceMode {
@@ -30,6 +31,7 @@ export function WorkspaceLayout() {
               <AiPanel />
             </div>
           </div>
+          <AnalysisToast />
         </div>
       </WorkspaceErrorBoundary>
     </WorkspaceProvider>

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { UserButton } from "@clerk/nextjs";
 import {
   ClipboardPaste,
+  FileCode2,
   FolderOpen,
   GitBranch,
   Loader2,
@@ -22,11 +23,19 @@ export function TopBar() {
     isAnalyzing,
     isSupported,
     canAnalyze,
+    analysisResult,
+    activeAnalyzeLabel,
     switchToFolder,
     switchToPaste,
     openFolder,
     analyzeFile,
   } = useWorkspace();
+
+  const analyzeLabel = isAnalyzing
+    ? "Analyzing..."
+    : analysisResult
+      ? "Re-analyze"
+      : "Analyze";
 
   return (
     <header className="flex h-16 shrink-0 items-center gap-4 border-b border-slate-200/80 bg-white/95 px-4 backdrop-blur">
@@ -42,9 +51,9 @@ export function TopBar() {
 
       <Separator orientation="vertical" className="h-5" />
 
-      <div className="hidden flex-col sm:flex">
+      <div className="hidden min-w-0 flex-col sm:flex">
         <span className="text-xs font-medium text-slate-700">Workspace</span>
-        <span className="text-[11px] text-slate-500">
+        <span className="truncate text-[11px] text-slate-500">
           Local code explorer and AI diagrammer
         </span>
       </div>
@@ -72,6 +81,18 @@ export function TopBar() {
         </Button>
       </div>
 
+      {activeAnalyzeLabel ? (
+        <div className="hidden min-w-0 items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 md:flex">
+          <FileCode2 className="size-3.5 shrink-0 text-slate-500" />
+          <span
+            className="truncate text-xs font-medium text-slate-700"
+            title={activeAnalyzeLabel}
+          >
+            {activeAnalyzeLabel}
+          </span>
+        </div>
+      ) : null}
+
       <div className="ml-auto flex items-center gap-2">
         {mode === "folder" ? (
           <Button
@@ -92,7 +113,7 @@ export function TopBar() {
           onClick={analyzeFile}
         >
           {isAnalyzing ? <Loader2 className="animate-spin" /> : <Sparkles />}
-          {isAnalyzing ? "Analyzing..." : "Analyze"}
+          {analyzeLabel}
         </Button>
         {isClerkPublishableKeySet() ? <UserButton /> : null}
       </div>

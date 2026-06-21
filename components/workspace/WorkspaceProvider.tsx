@@ -4,6 +4,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -32,10 +33,19 @@ import {
 import type { AnalysisHistoryItem } from "@/lib/supabase/types";
 
 type SidebarTab = "explorer" | "history";
+type AiPanelTab = "diagram" | "explanation";
+
+type AnalysisToastState = {
+  title: string;
+  description?: string;
+};
 
 type WorkspaceContextValue = {
   mode: WorkspaceMode;
   sidebarTab: SidebarTab;
+  aiPanelTab: AiPanelTab;
+  activeAnalyzeLabel: string | null;
+  analysisToast: AnalysisToastState | null;
   fileTree: FileNode | null;
   selectedFile: FileNode | null;
   fileContent: string | null;
@@ -59,6 +69,8 @@ type WorkspaceContextValue = {
   switchToFolder: () => void;
   switchToPaste: () => void;
   setSidebarTab: (tab: SidebarTab) => void;
+  setAiPanelTab: (tab: AiPanelTab) => void;
+  dismissAnalysisToast: () => void;
   setPastedCode: (code: string) => void;
   setPastedLanguage: (language: string) => void;
   openFolder: () => Promise<void>;
@@ -121,6 +133,10 @@ export function WorkspaceProvider({
 }>) {
   const [mode, setMode] = useState<WorkspaceMode>(initialMode);
   const [sidebarTab, setSidebarTab] = useState<SidebarTab>("explorer");
+  const [aiPanelTab, setAiPanelTab] = useState<AiPanelTab>("diagram");
+  const [analysisToast, setAnalysisToast] = useState<AnalysisToastState | null>(
+    null
+  );
   const [fileTree, setFileTree] = useState<FileNode | null>(null);
   const [selectedFile, setSelectedFile] = useState<FileNode | null>(null);
   const [fileContent, setFileContent] = useState<string | null>(null);
@@ -149,6 +165,36 @@ export function WorkspaceProvider({
     () => getPasteByteLength(pastedCode),
     [pastedCode]
   );
+  const activeAnalyzeLabel = useMemo(() => {
+    if (mode === "paste") {
+      const trimmed = pastedCode.trim();
+      return trimmed
+        ? getPasteSnippetFileName(pastedLanguage)
+        : "Quick Paste snippet";
+    }
+
+    return selectedFile?.name ?? null;
+  }, [mode, pastedCode, pastedLanguage, selectedFile]);
+
+  const dismissAnalysisToast = useCallback(() => {
+    setAnalysisToast(null);
+  }, []);
+
+  const showAnalysisToast = useCallback((toast: AnalysisToastState) => {
+    setAnalysisToast(toast);
+  }, []);
+
+  useEffect(() => {
+    if (!analysisToast) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setAnalysisToast(null);
+    }, 4500);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [analysisToast]);
 
   const canAnalyze = useMemo(() => {
     if (isAnalyzing || isReadingFile) {
@@ -324,6 +370,7 @@ export function WorkspaceProvider({
         mermaid: data.mermaid ?? "",
       });
       setActiveHistoryId(id);
+      setAiPanelTab("diagram");
     } catch {
       setAnalysisError("Network error while loading saved analysis.");
     }
@@ -437,6 +484,7 @@ export function WorkspaceProvider({
 
     setIsAnalyzing(true);
     setAnalysisError(null);
+    setAiPanelTab("diagram");
 
     try {
       const response = await fetch("/api/analyze", {
@@ -469,6 +517,11 @@ export function WorkspaceProvider({
 
       setAnalysisResult(data);
       setActiveHistoryId(null);
+      setAiPanelTab("diagram");
+      showAnalysisToast({
+        title: "Analysis complete",
+        description: "Flowchart ready — saved to History.",
+      });
       void refreshHistory();
     } catch {
       setAnalysisError(
@@ -488,12 +541,16 @@ export function WorkspaceProvider({
     fileContent,
     fileLanguage,
     refreshHistory,
+    showAnalysisToast,
   ]);
 
   const value = useMemo(
     () => ({
       mode,
       sidebarTab,
+      aiPanelTab,
+      activeAnalyzeLabel,
+      analysisToast,
       fileTree,
       selectedFile,
       fileContent,
@@ -517,6 +574,8 @@ export function WorkspaceProvider({
       switchToFolder,
       switchToPaste,
       setSidebarTab: updateSidebarTab,
+      setAiPanelTab,
+      dismissAnalysisToast,
       setPastedCode: updatePastedCode,
       setPastedLanguage: updatePastedLanguage,
       openFolder,
@@ -532,6 +591,9 @@ export function WorkspaceProvider({
     [
       mode,
       sidebarTab,
+      aiPanelTab,
+      activeAnalyzeLabel,
+      analysisToast,
       fileTree,
       selectedFile,
       fileContent,
@@ -555,6 +617,8 @@ export function WorkspaceProvider({
       switchToFolder,
       switchToPaste,
       updateSidebarTab,
+      setAiPanelTab,
+      dismissAnalysisToast,
       updatePastedCode,
       updatePastedLanguage,
       openFolder,
