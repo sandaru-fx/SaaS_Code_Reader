@@ -13,6 +13,13 @@ export type LearningModule = {
   status: "locked" | "current" | "completed";
 };
 
+export type ProjectOverview = {
+  summary: string;
+  techStack: string[];
+  architecture: string;
+};
+
 export type AnalyzeProjectResponseBody = {
+  overview: ProjectOverview;
   learningPath: LearningModule[];
 };
