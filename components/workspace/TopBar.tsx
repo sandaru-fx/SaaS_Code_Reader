@@ -9,6 +9,7 @@ import {
   GitBranch,
   Loader2,
   Maximize2,
+  MessageSquare,
   Minimize2,
   Moon,
   Sparkles,
@@ -42,6 +43,8 @@ export function TopBar({ onToggleTheme, isDark }: TopBarProps) {
     switchToGuide,
     openFolder,
     analyzeFile,
+    isChatOpen,
+    toggleChat,
   } = useWorkspace();
 
   const analyzeLabel = isAnalyzing
@@ -130,6 +133,18 @@ export function TopBar({ onToggleTheme, isDark }: TopBarProps) {
           aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
         >
           {isDark ? <Sun className="size-4" /> : <Moon className="size-4" />}
+        </Button>
+        <Button
+          type="button"
+          variant={isChatOpen ? "default" : "outline"}
+          size="sm"
+          className="h-9 rounded-full border-slate-200 bg-white px-4 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+          onClick={toggleChat}
+          aria-pressed={isChatOpen}
+          aria-label={isChatOpen ? "Close AI chat" : "Open AI chat"}
+        >
+          <MessageSquare className="size-3.5" />
+          <span className="hidden sm:inline">Chat</span>
         </Button>
         {analysisResult ? (
           <Button

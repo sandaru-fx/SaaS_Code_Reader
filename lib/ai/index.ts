@@ -14,6 +14,21 @@ export type {
   AnalyzeRequestBody,
   AnalyzeResponseBody,
 } from "@/lib/ai/types";
+export { sendChatMessage } from "@/lib/ai/chat";
+export {
+  CHAT_SYSTEM_PROMPT,
+  buildChatSystemInstruction,
+} from "@/lib/ai/chat-prompts";
+export type {
+  ChatContext,
+  ChatErrorResponse,
+  ChatHealthResponse,
+  ChatMessage,
+  ChatMessageRole,
+  ChatRequestBody,
+  ChatResponseBody,
+} from "@/lib/ai/chat-types";
+export { validateChatRequest } from "@/lib/ai/validate-chat-request";
 export {
   isGeminiConfigured,
   validateAnalyzeRequest,

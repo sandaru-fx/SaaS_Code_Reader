@@ -1,39 +1,42 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { X, Send, Bot, User, Loader2 } from "lucide-react";
+import { X, Send, Bot, User, Loader2, Code2, Sparkles } from "lucide-react";
 import { useWorkspace } from "@/components/workspace/WorkspaceProvider";
 import { Button } from "@/components/ui/button";
+import { getAnalyzeErrorMessage } from "@/lib/ai/get-analyze-error-message";
+import { MarkdownExplanation } from "@/components/workspace/MarkdownExplanation";
+import type { ChatMessage, ChatContext } from "@/lib/ai/chat-types";
+
+function getContextLabel(type: ChatContext["type"]) {
+  switch (type) {
+    case "code":
+      return "Selected code loaded as context";
+    case "explanation":
+      return "Explanation loaded as context";
+    default:
+      return "Workspace context loaded";
+  }
+}
 
 export function ChatPanel() {
   const { isChatOpen, closeChat, chatContext } = useWorkspace();
-  const [messages, setMessages] = useState<{ role: "user" | "ai"; content: string }[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading]);
 
-  // Handle initial context if provided when opening
   useEffect(() => {
-    if (isChatOpen && chatContext && messages.length === 0) {
-      let initialMessage = "";
-      if (chatContext.type === "code") {
-        initialMessage = `I have a question about this code:\n\`\`\`\n${chatContext.content}\n\`\`\``;
-      } else if (chatContext.type === "explanation") {
-        initialMessage = `I have a follow-up question about this explanation:\n"${chatContext.content}"`;
-      }
-      
-      if (initialMessage) {
-        setMessages([{ role: "user", content: initialMessage }]);
-        // In a real implementation, we would auto-trigger the AI response here
-        // For now, we'll just simulate it or wait for the user to type more
-      }
+    if (!isChatOpen) {
+      setMessages([]);
+      setInput("");
+      setIsLoading(false);
     }
-  }, [isChatOpen, chatContext, messages.length]);
+  }, [isChatOpen]);
 
   if (!isChatOpen) return null;
 
@@ -41,24 +44,46 @@ export function ChatPanel() {
     if (!input.trim() || isLoading) return;
 
     const userMessage = input.trim();
+    const nextMessages: ChatMessage[] = [
+      ...messages,
+      { role: "user", content: userMessage },
+    ];
+
     setInput("");
-    setMessages((prev) => [...prev, { role: "user", content: userMessage }]);
+    setMessages(nextMessages);
     setIsLoading(true);
 
     try {
-      // TODO: Connect to actual /api/chat endpoint
-      // Simulating API call for now
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setMessages((prev) => [
-        ...prev,
-        { role: "ai", content: "This is a simulated response. The backend API is not yet connected." },
-      ]);
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          messages: nextMessages,
+          context: chatContext ?? undefined,
+        }),
+      });
+
+      const data = (await response.json()) as
+        | { message?: string; error?: string };
+
+      if (!response.ok) {
+        throw new Error(getAnalyzeErrorMessage(response.status, data.error));
+      }
+
+      if (!data.message?.trim()) {
+        throw new Error("Chat returned an invalid response.");
+      }
+
+      setMessages((prev) => [...prev, { role: "ai", content: data.message! }]);
     } catch (error) {
-      console.error("Chat error:", error);
-      setMessages((prev) => [
-        ...prev,
-        { role: "ai", content: "Sorry, I encountered an error while processing your request." },
-      ]);
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Sorry, I encountered an error while processing your request.";
+
+      setMessages((prev) => [...prev, { role: "ai", content: message }]);
     } finally {
       setIsLoading(false);
     }
@@ -67,19 +92,20 @@ export function ChatPanel() {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      handleSend();
+      void handleSend();
     }
   };
 
   return (
-    <div className="flex h-full flex-col bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800">
-      {/* Header */}
-      <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 px-4 py-3 bg-slate-50/50 dark:bg-slate-900/50">
+    <div className="flex h-full flex-col border-l border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+      <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50/50 px-4 py-3 dark:border-slate-800 dark:bg-slate-900/50">
         <div className="flex items-center gap-2">
           <div className="flex h-6 w-6 items-center justify-center rounded-md bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400">
             <Bot className="h-4 w-4" />
           </div>
-          <h3 className="text-sm font-medium text-slate-900 dark:text-slate-100">AI Chat</h3>
+          <h3 className="text-sm font-medium text-slate-900 dark:text-slate-100">
+            AI Chat
+          </h3>
         </div>
         <Button
           variant="ghost"
@@ -91,16 +117,40 @@ export function ChatPanel() {
         </Button>
       </div>
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      {chatContext ? (
+        <div className="border-b border-blue-100 bg-blue-50/80 px-4 py-3 dark:border-blue-900 dark:bg-blue-950/30">
+          <div className="flex items-start gap-2">
+            {chatContext.type === "code" ? (
+              <Code2 className="mt-0.5 size-4 shrink-0 text-blue-600 dark:text-blue-400" />
+            ) : (
+              <Sparkles className="mt-0.5 size-4 shrink-0 text-blue-600 dark:text-blue-400" />
+            )}
+            <div className="min-w-0">
+              <p className="text-xs font-medium text-blue-800 dark:text-blue-300">
+                {getContextLabel(chatContext.type)}
+              </p>
+              <p className="mt-1 line-clamp-3 text-xs text-blue-700/80 dark:text-blue-400/80">
+                {chatContext.content}
+              </p>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      <div className="flex-1 space-y-4 overflow-y-auto p-4">
         {messages.length === 0 ? (
-          <div className="flex h-full flex-col items-center justify-center text-center text-slate-500 dark:text-slate-400 space-y-3">
+          <div className="flex h-full flex-col items-center justify-center space-y-3 text-center text-slate-500 dark:text-slate-400">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
               <Bot className="h-6 w-6 text-slate-400 dark:text-slate-500" />
             </div>
             <div>
-              <p className="text-sm font-medium text-slate-900 dark:text-slate-200">How can I help?</p>
-              <p className="text-xs mt-1 max-w-[200px]">Ask questions about your code, architecture, or get explanations.</p>
+              <p className="text-sm font-medium text-slate-900 dark:text-slate-200">
+                How can I help?
+              </p>
+              <p className="mt-1 max-w-[220px] text-xs">
+                Ask questions about your code, architecture, or request a simpler
+                explanation.
+              </p>
             </div>
           </div>
         ) : (
@@ -116,36 +166,43 @@ export function ChatPanel() {
                     : "bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
                 }`}
               >
-                {msg.role === "user" ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
+                {msg.role === "user" ? (
+                  <User className="h-4 w-4" />
+                ) : (
+                  <Bot className="h-4 w-4" />
+                )}
               </div>
               <div
-                className={`rounded-2xl px-4 py-2.5 max-w-[85%] text-sm ${
+                className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm ${
                   msg.role === "user"
-                    ? "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 rounded-tr-sm"
-                    : "bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-100 rounded-tl-sm"
+                    ? "rounded-tr-sm bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900"
+                    : "rounded-tl-sm bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-100"
                 }`}
               >
-                <p className="whitespace-pre-wrap break-words">{msg.content}</p>
+                {msg.role === "ai" ? (
+                  <MarkdownExplanation content={msg.content} variant="inline" />
+                ) : (
+                  <p className="whitespace-pre-wrap break-words">{msg.content}</p>
+                )}
               </div>
             </div>
           ))
         )}
-        {isLoading && (
-          <div className="flex gap-3 flex-row">
+        {isLoading ? (
+          <div className="flex flex-row gap-3">
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400">
               <Bot className="h-4 w-4" />
             </div>
-            <div className="rounded-2xl px-4 py-3 bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-100 rounded-tl-sm flex items-center gap-2">
+            <div className="flex items-center gap-2 rounded-2xl rounded-tl-sm bg-slate-100 px-4 py-3 text-slate-900 dark:bg-slate-800 dark:text-slate-100">
               <Loader2 className="h-4 w-4 animate-spin text-slate-500" />
               <span className="text-sm text-slate-500">Thinking...</span>
             </div>
           </div>
-        )}
+        ) : null}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input */}
-      <div className="p-3 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800">
+      <div className="border-t border-slate-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-900">
         <div className="relative flex items-end gap-2 rounded-xl border border-slate-200 bg-slate-50 p-1 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:focus-within:border-blue-500">
           <textarea
             value={input}
@@ -158,7 +215,7 @@ export function ChatPanel() {
           <Button
             size="icon"
             className="mb-1 mr-1 h-8 w-8 shrink-0 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 dark:bg-blue-600 dark:hover:bg-blue-700"
-            onClick={handleSend}
+            onClick={() => void handleSend()}
             disabled={!input.trim() || isLoading}
           >
             <Send className="h-4 w-4" />
