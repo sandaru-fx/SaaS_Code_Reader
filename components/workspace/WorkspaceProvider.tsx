@@ -17,6 +17,7 @@ import {
   DEFAULT_PASTE_LANGUAGE,
   type WorkspaceMode,
   type ChatContextData,
+  type SelectFileOptions,
 } from "@/components/workspace/types";
 import {
   isFileSystemAccessError,
@@ -87,7 +88,8 @@ type WorkspaceContextValue = {
   setPastedCode: (code: string) => void;
   setPastedLanguage: (language: string) => void;
   openFolder: () => Promise<void>;
-  selectFile: (node: FileNode, autoAnalyze?: boolean) => Promise<void>;
+  selectFile: (node: FileNode, options?: SelectFileOptions) => Promise<void>;
+  loadCachedAnalysis: (path: string) => boolean;
   analyzeFile: () => Promise<void>;
   loadHistoryItem: (id: string) => Promise<void>;
   deleteHistoryItem: (id: string) => Promise<void>;
@@ -178,6 +180,9 @@ export function WorkspaceProvider({
   const [folderSkippedCount, setFolderSkippedCount] = useState(0);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatContext, setChatContext] = useState<ChatContextData | null>(null);
+  const [analysisCache, setAnalysisCache] = useState<
+    Record<string, AnalyzeResponseBody>
+  >({});
   const readingPathRef = useRef<string | null>(null);
   const isSupported = useMemo(() => isFileSystemAccessSupported(), []);
   const pasteByteLength = useMemo(
@@ -308,7 +313,8 @@ export function WorkspaceProvider({
       return;
     }
 
-    setMode("folder");
+    const nextMode = mode === "guide" ? "guide" : "folder";
+    setMode(nextMode);
     exitFocusMode();
     resetPasteState(setPastedCode, setPastedLanguage);
     setIsLoading(true);
@@ -335,7 +341,7 @@ export function WorkspaceProvider({
     } finally {
       setIsLoading(false);
     }
-  }, [isSupported, exitFocusMode]);
+  }, [isSupported, exitFocusMode, mode]);
 
   const dismissError = useCallback(() => {
     setError(null);
@@ -464,12 +470,41 @@ export function WorkspaceProvider({
     [activeHistoryId]
   );
 
-  const selectFile = useCallback(async (node: FileNode, autoAnalyze = false) => {
+  const loadCachedAnalysis = useCallback(
+    (path: string) => {
+      const cached = analysisCache[path];
+      if (!cached) {
+        return false;
+      }
+
+      setAnalysisResult(cached);
+      setAnalysisError(null);
+      setAiPanelTab("explanation");
+
+      if (mode === "guide") {
+        openChat({
+          type: "explanation",
+          content: cached.explanation,
+          file: path,
+        });
+      }
+
+      return true;
+    },
+    [analysisCache, mode, openChat]
+  );
+
+  const selectFile = useCallback(
+    async (node: FileNode, options?: SelectFileOptions) => {
     if (node.type !== "file") {
       return;
     }
 
-    setMode("folder");
+    if (options?.keepGuideMode) {
+      setMode("guide");
+    } else {
+      setMode("folder");
+    }
     exitFocusMode();
     resetPasteState(setPastedCode, setPastedLanguage);
     readingPathRef.current = node.path;
@@ -478,7 +513,14 @@ export function WorkspaceProvider({
     setFileError(null);
     setFileContent(null);
     setFileLanguage(null);
-    resetAnalysisState(setAnalysisResult, setAnalysisError);
+
+    const cached = analysisCache[node.path];
+    if (cached) {
+      setAnalysisResult(cached);
+      setAnalysisError(null);
+    } else {
+      resetAnalysisState(setAnalysisResult, setAnalysisError);
+    }
 
     try {
       const result = await readFileNode(node);
@@ -489,12 +531,6 @@ export function WorkspaceProvider({
 
       setFileContent(result.content);
       setFileLanguage(result.language);
-      
-      // Auto-analyze if requested
-      if (autoAnalyze) {
-        // We can't call analyzeFile directly here because state hasn't updated yet
-        // We will handle this in GuidePanel instead by waiting for fileContent to update
-      }
     } catch (err) {
       if (readingPathRef.current !== node.path) {
         return;
@@ -511,7 +547,9 @@ export function WorkspaceProvider({
         setIsReadingFile(false);
       }
     }
-  }, [exitFocusMode]);
+  },
+    [exitFocusMode, analysisCache]
+  );
 
   const analyzeFile = useCallback(async () => {
     let code: string;
@@ -583,11 +621,33 @@ export function WorkspaceProvider({
       setAnalysisResult(data);
       setActiveHistoryId(null);
       setAiPanelTab("diagram");
+
+      if (selectedFile) {
+        setAnalysisCache((current) => ({
+          ...current,
+          [selectedFile.path]: data,
+        }));
+      }
+
       showAnalysisToast({
         title: "Analysis complete",
-        description: "Flowchart ready — saved to History.",
+        description:
+          mode === "guide"
+            ? "Explanation ready — ask follow-up questions in chat."
+            : "Flowchart ready — saved to History.",
       });
-      enterFocusMode();
+
+      if (mode === "guide" && selectedFile) {
+        setAiPanelTab("explanation");
+        openChat({
+          type: "explanation",
+          content: data.explanation,
+          file: selectedFile.path,
+        });
+      } else {
+        enterFocusMode();
+      }
+
       void refreshHistory();
     } catch {
       setAnalysisError(
@@ -609,6 +669,7 @@ export function WorkspaceProvider({
     refreshHistory,
     showAnalysisToast,
     enterFocusMode,
+    openChat,
   ]);
 
   const value = useMemo(
@@ -658,6 +719,7 @@ export function WorkspaceProvider({
       setPastedLanguage: updatePastedLanguage,
       openFolder,
       selectFile,
+      loadCachedAnalysis,
       analyzeFile,
       loadHistoryItem,
       deleteHistoryItem,
@@ -712,6 +774,7 @@ export function WorkspaceProvider({
       updatePastedLanguage,
       openFolder,
       selectFile,
+      loadCachedAnalysis,
       analyzeFile,
       loadHistoryItem,
       deleteHistoryItem,

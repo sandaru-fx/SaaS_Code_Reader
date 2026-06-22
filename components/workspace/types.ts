@@ -6,6 +6,11 @@ export interface ChatContextData {
   file?: string;
 }
 
+export type SelectFileOptions = {
+  autoAnalyze?: boolean;
+  keepGuideMode?: boolean;
+};
+
 export const DEFAULT_PASTE_LANGUAGE = "javascript";
 
 export const PASTE_LANGUAGE_OPTIONS = [

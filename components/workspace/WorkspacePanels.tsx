@@ -12,7 +12,7 @@ import { useWorkspace } from "@/components/workspace/WorkspaceProvider";
 import { AI_PANEL_MAX_WIDTH } from "@/lib/workspace/panel-layout";
 
 export function WorkspacePanels() {
-  const { isFocusMode, mode, fileTree, isChatOpen } = useWorkspace();
+  const { isFocusMode, mode, fileTree, isChatOpen, selectedFile } = useWorkspace();
   const {
     sidebarWidth,
     aiPanelWidth,
@@ -60,6 +60,8 @@ export function WorkspacePanels() {
   }
 
   if (mode === "guide") {
+    const inLesson = Boolean(selectedFile);
+
     return (
       <div className="flex min-h-0 flex-1 overflow-hidden bg-slate-50/70">
         <div
@@ -71,9 +73,32 @@ export function WorkspacePanels() {
 
         <ResizeHandle onResize={resizeSidebar} />
 
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-          <GuidePanel />
+        <div
+          className={
+            inLesson
+              ? "flex h-full w-[300px] min-h-0 shrink-0 flex-col overflow-hidden border-r border-slate-200 dark:border-slate-800"
+              : "flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden"
+          }
+        >
+          <GuidePanel compact={inLesson} />
         </div>
+
+        {inLesson ? (
+          <>
+            <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+              <CodeViewer />
+            </div>
+
+            <ResizeHandle onResize={resizeAiPanel} />
+
+            <div
+              className="flex h-full min-h-0 shrink-0 flex-col overflow-hidden"
+              style={{ width: aiPanelWidth }}
+            >
+              <AiPanel />
+            </div>
+          </>
+        ) : null}
 
         {isChatOpen && (
           <>
