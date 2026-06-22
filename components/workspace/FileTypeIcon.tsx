@@ -133,10 +133,19 @@ export function FileTypeIcon({
       className={cn(
         "flex size-5 shrink-0 items-center justify-center rounded-md",
         style.bgClassName,
+        "dark:bg-white/[0.04] dark:border dark:border-white/[0.06]",
         className
       )}
     >
-      <Icon className={cn("size-3", style.textClassName, iconClassName)} />
+      <Icon
+        className={cn(
+          "size-3",
+          style.textClassName,
+          "dark:text-[#14d1a0]",
+          iconClassName
+        )}
+        strokeWidth={1.5}
+      />
     </span>
   );
 }

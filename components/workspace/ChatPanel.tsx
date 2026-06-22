@@ -97,39 +97,39 @@ export function ChatPanel() {
   };
 
   return (
-    <div className="flex h-full flex-col border-l border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
-      <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50/50 px-4 py-3 dark:border-slate-800 dark:bg-slate-900/50">
-        <div className="flex items-center gap-2">
-          <div className="flex h-6 w-6 items-center justify-center rounded-md bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400">
-            <Bot className="h-4 w-4" />
+    <div className="flex h-full flex-col border-l border-slate-200 bg-white dark:border-white/[0.06] dark:bg-[#121212]">
+      <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50/50 px-5 py-4 dark:border-white/[0.06] dark:bg-[#121212]">
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-100 text-blue-600 dark:bg-[#14d1a0]/15 dark:text-[#14d1a0] dark:border dark:border-[#14d1a0]/25">
+            <Bot className="h-4 w-4" strokeWidth={1.5} />
           </div>
-          <h3 className="text-sm font-medium text-slate-900 dark:text-slate-100">
+          <h3 className="text-sm font-medium text-slate-900 dark:text-[#e3e3e3]">
             AI Chat
           </h3>
         </div>
         <Button
           variant="ghost"
           size="icon"
-          className="h-7 w-7 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
+          className="h-7 w-7 text-slate-500 hover:text-slate-900 dark:text-[#e3e3e3]/55 dark:hover:bg-white/[0.05] dark:hover:text-[#e3e3e3]"
           onClick={closeChat}
         >
-          <X className="h-4 w-4" />
+          <X className="h-4 w-4" strokeWidth={1.5} />
         </Button>
       </div>
 
       {chatContext ? (
-        <div className="border-b border-blue-100 bg-blue-50/80 px-4 py-3 dark:border-blue-900 dark:bg-blue-950/30">
+        <div className="border-b border-blue-100 bg-blue-50/80 px-5 py-3 dark:border-[#14d1a0]/15 dark:bg-[#14d1a0]/[0.06]">
           <div className="flex items-start gap-2">
             {chatContext.type === "code" ? (
-              <Code2 className="mt-0.5 size-4 shrink-0 text-blue-600 dark:text-blue-400" />
+              <Code2 className="mt-0.5 size-4 shrink-0 text-blue-600 premium-accent" strokeWidth={1.5} />
             ) : (
-              <Sparkles className="mt-0.5 size-4 shrink-0 text-blue-600 dark:text-blue-400" />
+              <Sparkles className="mt-0.5 size-4 shrink-0 text-blue-600 premium-accent" strokeWidth={1.5} />
             )}
             <div className="min-w-0">
-              <p className="text-xs font-medium text-blue-800 dark:text-blue-300">
+              <p className="text-xs font-medium text-blue-800 dark:text-[#14d1a0]">
                 {getContextLabel(chatContext.type)}
               </p>
-              <p className="mt-1 line-clamp-3 text-xs text-blue-700/80 dark:text-blue-400/80">
+              <p className="mt-1 line-clamp-3 text-xs text-blue-700/80 dark:text-[#e3e3e3]/55">
                 {chatContext.content}
               </p>
             </div>
@@ -137,17 +137,17 @@ export function ChatPanel() {
         </div>
       ) : null}
 
-      <div className="flex-1 space-y-4 overflow-y-auto p-4">
+      <div className="flex-1 space-y-4 overflow-y-auto p-5">
         {messages.length === 0 ? (
-          <div className="flex h-full flex-col items-center justify-center space-y-3 text-center text-slate-500 dark:text-slate-400">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
-              <Bot className="h-6 w-6 text-slate-400 dark:text-slate-500" />
+          <div className="flex h-full flex-col items-center justify-center space-y-3 text-center text-slate-500 dark:text-[#e3e3e3]/55">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 dark:bg-white/[0.04] dark:border dark:border-white/[0.06]">
+              <Bot className="h-6 w-6 text-slate-400 premium-accent" strokeWidth={1.25} />
             </div>
             <div>
-              <p className="text-sm font-medium text-slate-900 dark:text-slate-200">
+              <p className="text-sm font-medium text-slate-900 dark:text-[#e3e3e3]">
                 How can I help?
               </p>
-              <p className="mt-1 max-w-[220px] text-xs">
+              <p className="mt-1 max-w-[240px] text-xs leading-5 dark:text-[#e3e3e3]/45">
                 Ask questions about your code, architecture, or request a simpler
                 explanation.
               </p>
@@ -162,21 +162,21 @@ export function ChatPanel() {
               <div
                 className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${
                   msg.role === "user"
-                    ? "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900"
-                    : "bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
+                    ? "bg-slate-900 text-white dark:bg-white/[0.08] dark:text-[#e3e3e3]"
+                    : "bg-blue-100 text-blue-600 dark:bg-[#14d1a0]/15 dark:text-[#14d1a0] dark:border dark:border-[#14d1a0]/25"
                 }`}
               >
                 {msg.role === "user" ? (
-                  <User className="h-4 w-4" />
+                  <User className="h-4 w-4" strokeWidth={1.5} />
                 ) : (
-                  <Bot className="h-4 w-4" />
+                  <Bot className="h-4 w-4" strokeWidth={1.5} />
                 )}
               </div>
               <div
                 className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm ${
                   msg.role === "user"
-                    ? "rounded-tr-sm bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900"
-                    : "rounded-tl-sm bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-100"
+                    ? "rounded-tr-sm bg-slate-900 text-white dark:bg-[#14d1a0]/15 dark:text-[#e3e3e3] dark:border dark:border-[#14d1a0]/25"
+                    : "rounded-tl-sm bg-slate-100 text-slate-900 dark:bg-white/[0.04] dark:text-[#e3e3e3] dark:border dark:border-white/[0.06]"
                 }`}
               >
                 {msg.role === "ai" ? (
@@ -190,39 +190,39 @@ export function ChatPanel() {
         )}
         {isLoading ? (
           <div className="flex flex-row gap-3">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400">
-              <Bot className="h-4 w-4" />
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-600 dark:bg-[#14d1a0]/15 dark:text-[#14d1a0] dark:border dark:border-[#14d1a0]/25">
+              <Bot className="h-4 w-4" strokeWidth={1.5} />
             </div>
-            <div className="flex items-center gap-2 rounded-2xl rounded-tl-sm bg-slate-100 px-4 py-3 text-slate-900 dark:bg-slate-800 dark:text-slate-100">
-              <Loader2 className="h-4 w-4 animate-spin text-slate-500" />
-              <span className="text-sm text-slate-500">Thinking...</span>
+            <div className="flex items-center gap-2 rounded-2xl rounded-tl-sm bg-slate-100 px-4 py-3 text-slate-900 dark:bg-white/[0.04] dark:text-[#e3e3e3] dark:border dark:border-white/[0.06]">
+              <Loader2 className="h-4 w-4 animate-spin text-slate-500 dark:text-[#14d1a0]" />
+              <span className="text-sm text-slate-500 dark:text-[#e3e3e3]/55">Thinking...</span>
             </div>
           </div>
         ) : null}
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="border-t border-slate-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-900">
-        <div className="relative flex items-end gap-2 rounded-xl border border-slate-200 bg-slate-50 p-1 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:focus-within:border-blue-500">
+      <div className="border-t border-slate-200 bg-white p-4 dark:border-white/[0.06] dark:bg-[#121212]">
+        <div className="relative flex items-end gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-1 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 dark:border-white/[0.08] dark:bg-white/[0.03] dark:focus-within:border-[#14d1a0]/40 dark:focus-within:ring-[#14d1a0]/20">
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Ask a question..."
-            className="max-h-32 min-h-[40px] w-full resize-none bg-transparent px-3 py-2.5 text-sm outline-none placeholder:text-slate-400 dark:text-slate-100 dark:placeholder:text-slate-500"
+            className="max-h-32 min-h-[40px] w-full resize-none bg-transparent px-3 py-2.5 text-sm outline-none placeholder:text-slate-400 dark:text-[#e3e3e3] dark:placeholder:text-[#e3e3e3]/35"
             rows={1}
           />
           <Button
             size="icon"
-            className="mb-1 mr-1 h-8 w-8 shrink-0 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 dark:bg-blue-600 dark:hover:bg-blue-700"
+            className="mb-1 mr-1 h-8 w-8 shrink-0 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 premium-btn-primary"
             onClick={() => void handleSend()}
             disabled={!input.trim() || isLoading}
           >
-            <Send className="h-4 w-4" />
+            <Send className="h-4 w-4" strokeWidth={1.5} />
           </Button>
         </div>
         <div className="mt-2 text-center">
-          <span className="text-[10px] text-slate-400 dark:text-slate-500">
+          <span className="text-[10px] text-slate-400 dark:text-[#e3e3e3]/35">
             Shift + Enter for new line
           </span>
         </div>

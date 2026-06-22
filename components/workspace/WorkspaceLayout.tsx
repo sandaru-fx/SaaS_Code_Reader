@@ -21,12 +21,13 @@ function WorkspaceShell() {
 
   return (
     <div
+      suppressHydrationWarning
       className={cn(
-        "flex h-screen flex-col overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.12),transparent_30%),linear-gradient(180deg,#f8fafc,#eef2f7)] p-3 dark:bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.08),transparent_30%),linear-gradient(180deg,#0f172a,#020617)]",
+        "flex h-screen flex-col overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.12),transparent_30%),linear-gradient(180deg,#f8fafc,#eef2f7)] p-3 dark:bg-[radial-gradient(ellipse_at_top_left,rgba(20,209,160,0.06),transparent_40%),radial-gradient(ellipse_at_bottom_right,rgba(204,122,49,0.04),transparent_40%),#0a0a0a]",
         isDark && "dark"
       )}
     >
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[1.5rem] border border-white bg-white/90 shadow-2xl shadow-slate-950/10 backdrop-blur dark:border-slate-800 dark:bg-slate-900/95">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[1.5rem] border border-white bg-white/90 shadow-2xl shadow-slate-950/10 backdrop-blur dark:border-white/[0.06] dark:bg-[#121212]/95 dark:shadow-black/40">
         <TopBar onToggleTheme={toggleTheme} isDark={isDark} />
         <WorkspacePanels />
       </div>

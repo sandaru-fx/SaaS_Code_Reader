@@ -54,34 +54,36 @@ export function TopBar({ onToggleTheme, isDark }: TopBarProps) {
       : "Analyze";
 
   return (
-    <header className="flex h-16 shrink-0 items-center gap-4 border-b border-slate-200/80 bg-white/95 px-4 backdrop-blur dark:border-slate-800 dark:bg-slate-900/95">
+    <header className="flex h-16 shrink-0 items-center gap-4 border-b border-slate-200/80 bg-white/95 px-6 backdrop-blur dark:border-white/[0.06] dark:bg-[#121212]/95">
       <Link
         href="/"
-        className="flex items-center gap-2 text-sm font-semibold tracking-tight transition-opacity hover:opacity-80"
+        className="flex items-center gap-2.5 text-sm font-semibold tracking-tight transition-opacity hover:opacity-80"
       >
-        <span className="flex size-9 items-center justify-center rounded-2xl bg-slate-950 text-white shadow-sm dark:bg-slate-100 dark:text-slate-950">
-          <GitBranch className="size-4" />
+        <span className="flex size-9 items-center justify-center rounded-2xl bg-slate-950 text-white shadow-sm premium-btn-primary">
+          <GitBranch className="size-4" strokeWidth={1.75} />
         </span>
-        <span className="dark:text-slate-100">CodeRider</span>
+        <span className="dark:text-[#e3e3e3]">CodeRider</span>
       </Link>
 
-      <Separator orientation="vertical" className="h-5" />
+      <Separator orientation="vertical" className="h-5 dark:bg-white/10" />
 
       <div className="hidden min-w-0 flex-col sm:flex">
-        <span className="text-xs font-medium text-slate-700 dark:text-slate-200">
+        <span className="text-xs font-medium text-slate-700 dark:text-[#e3e3e3]/85">
           Workspace
         </span>
-        <span className="truncate text-[11px] text-slate-500 dark:text-slate-400">
+        <span className="truncate text-[11px] text-slate-500 dark:text-[#e3e3e3]/45">
           Local code explorer and AI diagrammer
         </span>
       </div>
 
-      <div className="flex items-center rounded-full border border-slate-200 bg-slate-100 p-1 dark:border-slate-700 dark:bg-slate-800">
+      <div className="flex items-center rounded-full border border-slate-200 bg-slate-100 p-1 dark:border-white/[0.06] dark:bg-white/[0.03]">
         <Button
           type="button"
           variant={mode === "guide" ? "default" : "ghost"}
           size="sm"
-          className="h-8 rounded-full px-3 text-xs"
+          className={`h-8 rounded-full px-3 text-xs ${
+            mode === "guide" ? "premium-btn-primary" : "dark:text-[#e3e3e3]/70"
+          }`}
           onClick={switchToGuide}
         >
           Guide Me
@@ -90,29 +92,33 @@ export function TopBar({ onToggleTheme, isDark }: TopBarProps) {
           type="button"
           variant={mode === "folder" ? "default" : "ghost"}
           size="sm"
-          className="h-8 rounded-full px-3 text-xs"
+          className={`h-8 rounded-full px-3 text-xs ${
+            mode === "folder" ? "premium-btn-primary" : "dark:text-[#e3e3e3]/70"
+          }`}
           onClick={switchToFolder}
         >
-          <FolderOpen className="size-3.5" />
+          <FolderOpen className="size-3.5" strokeWidth={1.5} />
           Explore
         </Button>
         <Button
           type="button"
           variant={mode === "paste" ? "default" : "ghost"}
           size="sm"
-          className="h-8 rounded-full px-3 text-xs"
+          className={`h-8 rounded-full px-3 text-xs ${
+            mode === "paste" ? "premium-btn-primary" : "dark:text-[#e3e3e3]/70"
+          }`}
           onClick={switchToPaste}
         >
-          <ClipboardPaste className="size-3.5" />
+          <ClipboardPaste className="size-3.5" strokeWidth={1.5} />
           Paste
         </Button>
       </div>
 
       {activeAnalyzeLabel ? (
-        <div className="hidden min-w-0 items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 md:flex dark:border-slate-700 dark:bg-slate-800">
-          <FileCode2 className="size-3.5 shrink-0 text-slate-500 dark:text-slate-400" />
+        <div className="hidden min-w-0 items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 md:flex dark:border-white/[0.06] dark:bg-white/[0.03]">
+          <FileCode2 className="size-3.5 shrink-0 text-slate-500 dark:text-[#e3e3e3]/50" strokeWidth={1.5} />
           <span
-            className="truncate text-xs font-medium text-slate-700 dark:text-slate-200"
+            className="truncate text-xs font-medium text-slate-700 dark:text-[#e3e3e3]/85"
             title={activeAnalyzeLabel}
           >
             {activeAnalyzeLabel}
@@ -121,29 +127,31 @@ export function TopBar({ onToggleTheme, isDark }: TopBarProps) {
       ) : null}
 
       <div className="ml-auto flex items-center gap-2">
-        <span className="hidden text-[11px] text-slate-400 lg:inline dark:text-slate-500">
+        <span className="hidden text-[11px] text-slate-400 lg:inline dark:text-[#e3e3e3]/40">
           Ctrl+Enter to analyze
         </span>
         <Button
           type="button"
           variant="outline"
           size="sm"
-          className="h-9 w-9 rounded-full border-slate-200 bg-white p-0 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+          className="h-9 w-9 rounded-full border-slate-200 bg-white p-0 shadow-sm dark:border-white/[0.06] dark:bg-white/[0.03] dark:text-[#e3e3e3]"
           onClick={onToggleTheme}
           aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
         >
-          {isDark ? <Sun className="size-4" /> : <Moon className="size-4" />}
+          {isDark ? <Sun className="size-4" strokeWidth={1.5} /> : <Moon className="size-4" strokeWidth={1.5} />}
         </Button>
         <Button
           type="button"
           variant={isChatOpen ? "default" : "outline"}
           size="sm"
-          className="h-9 rounded-full border-slate-200 bg-white px-4 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+          className={`h-9 rounded-full border-slate-200 bg-white px-4 shadow-sm dark:border-white/[0.06] dark:bg-white/[0.03] dark:text-[#e3e3e3] ${
+            isChatOpen ? "premium-btn-primary" : ""
+          }`}
           onClick={toggleChat}
           aria-pressed={isChatOpen}
           aria-label={isChatOpen ? "Close AI chat" : "Open AI chat"}
         >
-          <MessageSquare className="size-3.5" />
+          <MessageSquare className="size-3.5" strokeWidth={1.5} />
           <span className="hidden sm:inline">Chat</span>
         </Button>
         {analysisResult ? (
@@ -151,17 +159,17 @@ export function TopBar({ onToggleTheme, isDark }: TopBarProps) {
             type="button"
             variant="outline"
             size="sm"
-            className="hidden h-9 rounded-full border-slate-200 bg-white px-4 shadow-sm sm:inline-flex dark:border-slate-700 dark:bg-slate-800"
+            className="hidden h-9 rounded-full border-slate-200 bg-white px-4 shadow-sm sm:inline-flex dark:border-white/[0.06] dark:bg-white/[0.03] dark:text-[#e3e3e3]"
             onClick={isFocusMode ? exitFocusMode : enterFocusMode}
           >
             {isFocusMode ? (
               <>
-                <Minimize2 className="size-3.5" />
+                <Minimize2 className="size-3.5" strokeWidth={1.5} />
                 Exit focus
               </>
             ) : (
               <>
-                <Maximize2 className="size-3.5" />
+                <Maximize2 className="size-3.5" strokeWidth={1.5} />
                 Focus diagram
               </>
             )}
@@ -171,12 +179,12 @@ export function TopBar({ onToggleTheme, isDark }: TopBarProps) {
           <Button
             variant="outline"
             size="sm"
-            className="h-9 rounded-full border-slate-200 bg-white px-4 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+            className="h-9 rounded-full border-slate-200 bg-white px-4 shadow-sm dark:border-white/[0.06] dark:bg-white/[0.03] dark:text-[#e3e3e3]"
             disabled={!isSupported || isLoading}
             onClick={openFolder}
             suppressHydrationWarning
           >
-            {isLoading ? <Loader2 className="animate-spin" /> : <FolderOpen />}
+            {isLoading ? <Loader2 className="animate-spin" /> : <FolderOpen strokeWidth={1.5} />}
             {isLoading ? "Opening..." : "Open Folder"}
           </Button>
         ) : null}
@@ -184,22 +192,22 @@ export function TopBar({ onToggleTheme, isDark }: TopBarProps) {
           <Button
             variant="outline"
             size="sm"
-            className="h-9 rounded-full border-slate-200 bg-white px-4 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+            className="h-9 rounded-full border-slate-200 bg-white px-4 shadow-sm dark:border-white/[0.06] dark:bg-white/[0.03] dark:text-[#e3e3e3]"
             disabled={!isSupported || isLoading}
             onClick={openFolder}
             suppressHydrationWarning
           >
-            {isLoading ? <Loader2 className="animate-spin" /> : <FolderOpen />}
+            {isLoading ? <Loader2 className="animate-spin" /> : <FolderOpen strokeWidth={1.5} />}
             {isLoading ? "Opening..." : "Open Folder"}
           </Button>
         ) : null}
         <Button
           size="sm"
-          className="h-9 rounded-full px-4 shadow-sm"
+          className="h-9 rounded-full px-4 shadow-sm premium-btn-primary"
           disabled={!canAnalyze}
           onClick={analyzeFile}
         >
-          {isAnalyzing ? <Loader2 className="animate-spin" /> : <Sparkles />}
+          {isAnalyzing ? <Loader2 className="animate-spin" /> : <Sparkles strokeWidth={1.75} />}
           {analyzeLabel}
         </Button>
         {isClerkPublishableKeySet() ? <UserButton /> : null}

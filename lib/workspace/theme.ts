@@ -9,7 +9,7 @@ export function readWorkspaceTheme(): WorkspaceTheme {
 
   const stored = window.localStorage.getItem(WORKSPACE_THEME_KEY);
 
-  return stored === "dark" ? "dark" : "light";
+  return stored === "light" ? "light" : "dark";
 }
 
 export function storeWorkspaceTheme(theme: WorkspaceTheme): void {

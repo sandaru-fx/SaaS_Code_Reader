@@ -30,15 +30,15 @@ export function WorkspacePanels() {
     const focusAiWidth = Math.max(aiPanelWidth, AI_PANEL_MAX_WIDTH);
 
     return (
-      <div className="flex min-h-0 flex-1 overflow-hidden bg-slate-950/5">
-        <div className="flex min-h-0 min-w-0 flex-[0.95] flex-col overflow-hidden border-r border-slate-200 bg-slate-50">
+      <div className="flex min-h-0 flex-1 overflow-hidden bg-slate-950/5 dark:bg-[#0f0f0f]">
+        <div className="flex min-h-0 min-w-0 flex-[0.95] flex-col overflow-hidden border-r border-slate-200 bg-slate-50 dark:border-white/[0.06] dark:bg-[#0f0f0f]">
           <CodeViewer />
         </div>
 
         <ResizeHandle onResize={resizeAiPanel} />
 
         <div
-          className="flex h-full min-h-0 shrink-0 flex-col overflow-hidden bg-white shadow-xl shadow-slate-950/5"
+          className="flex h-full min-h-0 shrink-0 flex-col overflow-hidden bg-white shadow-xl shadow-slate-950/5 dark:bg-[#121212] dark:shadow-black/40"
           style={{ width: focusAiWidth }}
         >
           <AiPanel />
@@ -48,7 +48,7 @@ export function WorkspacePanels() {
           <>
             <ResizeHandle onResize={resizeChatPanel} />
             <div
-              className="flex h-full min-h-0 shrink-0 flex-col overflow-hidden shadow-xl shadow-slate-950/5"
+              className="flex h-full min-h-0 shrink-0 flex-col overflow-hidden shadow-xl shadow-slate-950/5 dark:shadow-black/40"
               style={{ width: chatPanelWidth }}
             >
               <ChatPanel />
@@ -63,7 +63,7 @@ export function WorkspacePanels() {
     const inLesson = Boolean(selectedFile);
 
     return (
-      <div className="flex min-h-0 flex-1 overflow-hidden bg-slate-50/70">
+      <div className="flex min-h-0 flex-1 overflow-hidden bg-slate-50/70 dark:bg-[#0f0f0f]">
         <div
           className="flex h-full min-h-0 shrink-0 flex-col overflow-hidden"
           style={{ width: sidebarWidth }}
@@ -76,7 +76,7 @@ export function WorkspacePanels() {
         <div
           className={
             inLesson
-              ? "flex h-full w-[300px] min-h-0 shrink-0 flex-col overflow-hidden border-r border-slate-200 dark:border-slate-800"
+              ? "flex h-full w-[320px] min-h-0 shrink-0 flex-col overflow-hidden border-r border-slate-200 dark:border-white/[0.06]"
               : "flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden"
           }
         >
@@ -104,7 +104,7 @@ export function WorkspacePanels() {
           <>
             <ResizeHandle onResize={resizeChatPanel} />
             <div
-              className="flex h-full min-h-0 shrink-0 flex-col overflow-hidden shadow-xl shadow-slate-950/5 z-10"
+              className="flex h-full min-h-0 shrink-0 flex-col overflow-hidden shadow-xl shadow-slate-950/5 z-10 dark:shadow-black/40"
               style={{ width: chatPanelWidth }}
             >
               <ChatPanel />
@@ -116,7 +116,7 @@ export function WorkspacePanels() {
   }
 
   return (
-    <div className="flex min-h-0 flex-1 overflow-hidden bg-slate-50/70">
+    <div className="flex min-h-0 flex-1 overflow-hidden bg-slate-50/70 dark:bg-[#0f0f0f]">
       <div
         className="flex h-full min-h-0 shrink-0 flex-col overflow-hidden"
         style={{ width: sidebarWidth }}
@@ -143,7 +143,7 @@ export function WorkspacePanels() {
         <>
           <ResizeHandle onResize={resizeChatPanel} />
           <div
-            className="flex h-full min-h-0 shrink-0 flex-col overflow-hidden shadow-xl shadow-slate-950/5 z-10"
+            className="flex h-full min-h-0 shrink-0 flex-col overflow-hidden shadow-xl shadow-slate-950/5 z-10 dark:shadow-black/40"
             style={{ width: chatPanelWidth }}
           >
             <ChatPanel />

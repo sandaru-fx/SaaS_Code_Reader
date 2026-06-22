@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import {
   readWorkspaceTheme,
@@ -9,7 +9,13 @@ import {
 } from "@/lib/workspace/theme";
 
 export function useWorkspaceTheme() {
-  const [theme, setTheme] = useState<WorkspaceTheme>(() => readWorkspaceTheme());
+  const [theme, setTheme] = useState<WorkspaceTheme>("dark");
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    setTheme(readWorkspaceTheme());
+    setHydrated(true);
+  }, []);
 
   const toggleTheme = useCallback(() => {
     setTheme((current) => {
@@ -23,5 +29,6 @@ export function useWorkspaceTheme() {
     isDark: theme === "dark",
     theme,
     toggleTheme,
+    hydrated,
   };
 }

@@ -20,7 +20,7 @@ export function FileBreadcrumbs({
 
   if (segments.length === 0) {
     return (
-      <span className={cn("truncate text-xs font-medium text-slate-500", className)}>
+      <span className={cn("truncate text-xs font-medium text-slate-500 dark:text-[#e3e3e3]/45", className)}>
         No file selected
       </span>
     );
@@ -37,14 +37,14 @@ export function FileBreadcrumbs({
         return (
           <span key={`${segment}-${index}`} className="flex min-w-0 items-center gap-1">
             {index > 0 ? (
-              <ChevronRight className="size-3 shrink-0 text-slate-300" />
+              <ChevronRight className="size-3 shrink-0 text-slate-300 dark:text-[#e3e3e3]/30" strokeWidth={1.5} />
             ) : null}
             <span
               className={cn(
                 "truncate font-mono text-xs",
                 isLast
-                  ? "font-medium text-slate-800"
-                  : "text-slate-500"
+                  ? "font-medium text-slate-800 dark:text-[#e3e3e3]"
+                  : "text-slate-500 dark:text-[#e3e3e3]/55"
               )}
               title={segment}
             >

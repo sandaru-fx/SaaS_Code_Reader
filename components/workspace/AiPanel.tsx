@@ -38,12 +38,12 @@ function AnalysisErrorState({
 function AnalysisLoadingState({ variant }: { variant: "diagram" | "explanation" }) {
   if (variant === "diagram") {
     return (
-      <div className="space-y-4 p-5">
+      <div className="space-y-4 p-6">
         <div>
-          <p className="text-sm font-semibold text-slate-900">
+          <p className="text-sm font-semibold text-slate-900 dark:text-[#e3e3e3]">
             Generating flowchart
           </p>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-500 dark:text-[#e3e3e3]/50">
             Step 1 of 2 — mapping architecture from your code
           </p>
         </div>
@@ -53,12 +53,12 @@ function AnalysisLoadingState({ variant }: { variant: "diagram" | "explanation" 
   }
 
   return (
-    <div className="space-y-4 p-5">
+    <div className="space-y-4 p-6">
       <div>
-        <p className="text-sm font-semibold text-slate-900">
+        <p className="text-sm font-semibold text-slate-900 dark:text-[#e3e3e3]">
           Writing explanation
         </p>
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-slate-500 dark:text-[#e3e3e3]/50">
           Step 2 of 2 — summarizing logic and runtime flow
         </p>
       </div>
@@ -80,9 +80,9 @@ export function AiPanel() {
   } = useWorkspace();
 
   return (
-    <aside className="flex h-full min-h-0 w-full flex-col border-l border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+    <aside className="flex h-full min-h-0 w-full flex-col border-l border-slate-200 bg-white dark:border-white/[0.06] dark:bg-[#121212]">
       {isFocusMode ? (
-        <div className="border-b border-blue-100 bg-blue-50 px-4 py-2 text-center text-[11px] font-medium text-blue-700 dark:border-blue-900 dark:bg-blue-950/50 dark:text-blue-300">
+        <div className="border-b border-blue-100 bg-blue-50 px-4 py-2 text-center text-[11px] font-medium text-blue-700 dark:border-[#14d1a0]/20 dark:bg-[#14d1a0]/10 dark:text-[#14d1a0]">
           Focus mode — diagram expanded for easier review
         </div>
       ) : null}
@@ -91,20 +91,20 @@ export function AiPanel() {
         onValueChange={(value) => setAiPanelTab(value as "diagram" | "explanation")}
         className="flex h-full min-h-0 flex-col gap-0"
       >
-        <div className="flex h-14 shrink-0 items-center bg-white px-4 dark:bg-slate-900">
-          <TabsList className="h-9 w-full rounded-full bg-slate-100 p-1 dark:bg-slate-800">
-            <TabsTrigger value="diagram" className="flex-1">
-              <GitBranch className="size-3.5" />
+        <div className="flex h-14 shrink-0 items-center bg-white px-5 dark:bg-[#121212]">
+          <TabsList className="h-9 w-full rounded-full bg-slate-100 p-1 dark:bg-white/[0.03] dark:border dark:border-white/[0.06]">
+            <TabsTrigger value="diagram" className="flex-1 data-[state=active]:premium-btn-primary dark:text-[#e3e3e3]/70 dark:data-[state=active]:text-[#0d1f1a]">
+              <GitBranch className="size-3.5" strokeWidth={1.5} />
               Diagram
             </TabsTrigger>
-            <TabsTrigger value="explanation" className="flex-1">
-              <Sparkles className="size-3.5" />
+            <TabsTrigger value="explanation" className="flex-1 data-[state=active]:premium-btn-primary dark:text-[#e3e3e3]/70 dark:data-[state=active]:text-[#0d1f1a]">
+              <Sparkles className="size-3.5" strokeWidth={1.5} />
               Explanation
             </TabsTrigger>
           </TabsList>
         </div>
 
-        <Separator />
+        <Separator className="dark:bg-white/[0.06]" />
 
         <TabsContent
           value="diagram"
@@ -119,12 +119,12 @@ export function AiPanel() {
                 onDismiss={dismissAnalysisError}
               />
             ) : analysisResult ? (
-              <div className="space-y-4 p-5">
+              <div className="space-y-5 p-6">
                 <div>
-                  <p className="text-sm font-semibold text-slate-900">
+                  <p className="text-sm font-semibold text-slate-900 dark:text-[#e3e3e3]">
                     Architecture Flowchart
                   </p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-slate-500 dark:text-[#e3e3e3]/50">
                     Zoom or open fullscreen to inspect the diagram
                   </p>
                 </div>
@@ -154,13 +154,13 @@ export function AiPanel() {
                 onDismiss={dismissAnalysisError}
               />
             ) : analysisResult ? (
-              <div className="space-y-4 p-5">
+              <div className="space-y-5 p-6">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                    <p className="text-sm font-semibold text-slate-900 dark:text-[#e3e3e3]">
                       AI Explanation
                     </p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                    <p className="text-xs text-slate-500 dark:text-[#e3e3e3]/50">
                       Step-by-step walkthrough of the logic
                     </p>
                   </div>
@@ -168,13 +168,13 @@ export function AiPanel() {
                     <CopyButton
                       text={analysisResult.explanation}
                       label="Copy"
-                      className="h-8 rounded-full text-xs"
+                      className="h-8 rounded-full text-xs dark:border-white/[0.08] dark:bg-white/[0.03] dark:text-[#e3e3e3]"
                     />
                     <Button
                       type="button"
                       variant="outline"
                       size="sm"
-                      className="h-8 rounded-full text-xs"
+                      className="h-8 rounded-full text-xs dark:border-white/[0.08] dark:bg-white/[0.03] dark:text-[#e3e3e3]"
                       onClick={() =>
                         downloadTextFile(
                           analysisResult.explanation,
@@ -187,14 +187,14 @@ export function AiPanel() {
                   </div>
                 </div>
                 <MarkdownExplanation content={analysisResult.explanation} />
-                
+
                 <div className="mt-6 flex justify-center pb-4">
                   <Button
                     variant="outline"
-                    className="gap-2 rounded-full border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 hover:text-blue-800 dark:border-blue-900 dark:bg-blue-950/30 dark:text-blue-400 dark:hover:bg-blue-900/50 dark:hover:text-blue-300"
+                    className="gap-2 rounded-full border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 hover:text-blue-800 dark:border-[#14d1a0]/30 dark:bg-[#14d1a0]/10 dark:text-[#14d1a0] dark:hover:bg-[#14d1a0]/20"
                     onClick={() => openChat({ type: "explanation", content: analysisResult.explanation })}
                   >
-                    <MessageSquare className="size-4" />
+                    <MessageSquare className="size-4" strokeWidth={1.5} />
                     Ask Follow-up Question
                   </Button>
                 </div>

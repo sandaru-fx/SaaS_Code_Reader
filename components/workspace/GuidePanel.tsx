@@ -13,7 +13,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { ProjectOverview } from "@/components/workspace/ProjectOverview";
 import { useWorkspace } from "@/components/workspace/WorkspaceProvider";
-import { FileTypeIcon } from "@/components/workspace/FileTypeIcon";
 import { serializeTreeForAI, findNodeByPath, readFileNode } from "@/lib/file-system";
 import type { LearningModule, ProjectOverview as ProjectOverviewData } from "@/lib/ai/project-types";
 
@@ -181,12 +180,14 @@ export function GuidePanel({ compact = false }: GuidePanelProps) {
 
   if (!fileTree) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center p-6 text-center">
-        <BookOpen className="mb-4 size-12 text-slate-300 dark:text-slate-600" />
+      <div className="flex flex-1 flex-col items-center justify-center p-8 text-center dark:bg-[#121212]">
+        <div className="mb-4 flex size-16 items-center justify-center rounded-2xl bg-slate-100 dark:bg-[#14d1a0]/10 dark:border dark:border-[#14d1a0]/20">
+          <BookOpen className="size-8 text-slate-400 premium-accent" strokeWidth={1.25} />
+        </div>
         <h2 className="text-xl font-semibold leading-7 text-[#1f1f1f] dark:text-[#e3e3e3]">
           AI Tutor Mode
         </h2>
-        <p className="max-w-sm text-base font-normal leading-6 text-slate-500 dark:text-slate-400">
+        <p className="mt-2 max-w-sm text-base font-normal leading-6 text-slate-500 dark:text-[#e3e3e3]/55">
           Open a folder to let the AI analyze your project and create a personalized
           learning path.
         </p>
@@ -196,12 +197,12 @@ export function GuidePanel({ compact = false }: GuidePanelProps) {
 
   if (isAnalyzingProject) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center p-6 text-center">
-        <Loader2 className="mb-4 size-8 animate-spin text-blue-500" />
+      <div className="flex flex-1 flex-col items-center justify-center p-8 text-center dark:bg-[#121212]">
+        <Loader2 className="mb-4 size-8 animate-spin text-blue-500 premium-accent" />
         <h2 className="text-xl font-semibold leading-7 text-[#1f1f1f] dark:text-[#e3e3e3]">
           Analyzing Project...
         </h2>
-        <p className="max-w-sm text-base font-normal leading-6 text-slate-500 dark:text-slate-400">
+        <p className="max-w-sm text-base font-normal leading-6 text-slate-500 dark:text-[#e3e3e3]/55">
           Reading project structure, tech stack, and generating your learning path.
         </p>
       </div>
@@ -222,21 +223,21 @@ export function GuidePanel({ compact = false }: GuidePanelProps) {
     <section>
       {!compact ? (
         <>
-          <div className="mb-4 flex items-center gap-2 text-blue-600 dark:text-blue-400">
-            <BookOpen className="size-5" />
+          <div className="mb-4 flex items-center gap-2 text-blue-600 premium-accent">
+            <BookOpen className="size-5" strokeWidth={1.5} />
             <h2 className="text-lg font-medium text-[#1f1f1f] dark:text-[#e3e3e3]">
               Learning Path
             </h2>
           </div>
-          <p className="mb-4 text-sm text-slate-500 dark:text-slate-400">
+          <p className="mb-5 text-sm text-slate-500 dark:text-[#e3e3e3]/55">
             Follow these modules in order to understand how this project works.
           </p>
         </>
       ) : (
-        <div className="mb-3 border-b border-slate-200 dark:border-slate-800">
-          <div className="flex items-center justify-between gap-2 px-4 py-3">
-            <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400">
-              <BookOpen className="size-4" />
+        <div className="mb-3 border-b border-slate-200 dark:border-white/[0.06]">
+          <div className="flex items-center justify-between gap-2 px-5 py-3">
+            <div className="flex items-center gap-2 text-blue-600 premium-accent">
+              <BookOpen className="size-4" strokeWidth={1.5} />
               <h2 className="text-sm font-semibold text-[#1f1f1f] dark:text-[#e3e3e3]">
                 Learning Path
               </h2>
@@ -245,20 +246,20 @@ export function GuidePanel({ compact = false }: GuidePanelProps) {
               type="button"
               variant="ghost"
               size="sm"
-              className="h-7 gap-1 rounded-full px-2 text-xs text-slate-600 dark:text-slate-300"
+              className="h-7 gap-1 rounded-full px-2 text-xs text-slate-600 dark:text-[#e3e3e3]/70 dark:hover:bg-white/[0.05]"
               onClick={exitGuideLesson}
             >
-              <ArrowLeft className="size-3.5" />
+              <ArrowLeft className="size-3.5" strokeWidth={1.5} />
               Overview
             </Button>
           </div>
           {isAnalyzingFile && selectedFile ? (
-            <div className="flex items-center gap-2 border-t border-slate-100 bg-blue-50/60 px-4 py-2 text-xs text-blue-700 dark:border-slate-800 dark:bg-blue-950/30 dark:text-blue-300">
+            <div className="flex items-center gap-2 border-t border-slate-100 bg-blue-50/60 px-5 py-2 text-xs text-blue-700 dark:border-white/[0.06] dark:bg-[#14d1a0]/10 dark:text-[#14d1a0]">
               <Loader2 className="size-3.5 animate-spin" />
               Analyzing {selectedFile.name}...
             </div>
           ) : isReadingFile && selectedFile ? (
-            <div className="flex items-center gap-2 border-t border-slate-100 bg-slate-50 px-4 py-2 text-xs text-slate-600 dark:border-slate-800 dark:bg-slate-900/50 dark:text-slate-300">
+            <div className="flex items-center gap-2 border-t border-slate-100 bg-slate-50 px-5 py-2 text-xs text-slate-600 dark:border-white/[0.06] dark:bg-white/[0.02] dark:text-[#e3e3e3]/65">
               <Loader2 className="size-3.5 animate-spin" />
               Loading {selectedFile.name}...
             </div>
@@ -266,43 +267,43 @@ export function GuidePanel({ compact = false }: GuidePanelProps) {
         </div>
       )}
 
-      <div className={compact ? "space-y-4 px-4 pb-4" : "space-y-6"}>
+      <div className={compact ? "space-y-3 px-5 pb-5" : "space-y-6"}>
         {derivedLearningPath?.map((module, index) => (
           <div
             key={module.id}
             className={`relative rounded-2xl border transition-all ${
-              compact ? "p-3" : "p-5"
+              compact ? "p-4" : "p-6"
             } ${
               module.status === "current"
-                ? "border-blue-200 bg-white shadow-md dark:border-blue-900/50 dark:bg-slate-900"
+                ? "border-blue-200 bg-white shadow-md dark:border-[#14d1a0]/30 dark:bg-[#1c1c1c] dark:shadow-[0_0_24px_-12px_rgba(20,209,160,0.2)]"
                 : module.status === "completed"
-                  ? "border-green-200 bg-green-50/50 dark:border-green-900/30 dark:bg-green-950/20"
-                  : "border-slate-200 bg-slate-50 opacity-70 dark:border-slate-800 dark:bg-slate-900/50"
+                  ? "border-green-200 bg-green-50/50 dark:border-[#14d1a0]/15 dark:bg-[#14d1a0]/[0.04]"
+                  : "border-slate-200 bg-slate-50 opacity-70 dark:border-white/[0.06] dark:bg-white/[0.02]"
             }`}
           >
             {!compact && index !== (derivedLearningPath?.length ?? 0) - 1 ? (
-              <div className="absolute bottom-[-24px] left-8 h-6 w-px bg-slate-200 dark:bg-slate-800" />
+              <div className="absolute bottom-[-24px] left-10 h-6 w-px bg-slate-200 dark:bg-white/[0.08]" />
             ) : null}
 
             <div
               className={`flex items-start justify-between gap-3 ${
-                compact ? "mb-2" : "mb-4"
+                compact ? "mb-3" : "mb-4"
               }`}
             >
               <div className="flex items-center gap-3">
                 <div
-                  className={`flex items-center justify-center rounded-full font-bold ${
-                    compact ? "size-6 text-xs" : "size-8 text-sm"
+                  className={`flex items-center justify-center rounded-full font-semibold ${
+                    compact ? "size-7 text-xs" : "size-9 text-sm"
                   } ${
                     module.status === "current"
-                      ? "bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
+                      ? "bg-blue-100 text-blue-600 dark:bg-[#14d1a0]/15 dark:text-[#14d1a0] dark:border dark:border-[#14d1a0]/30"
                       : module.status === "completed"
-                        ? "bg-green-100 text-green-600 dark:bg-green-900/50 dark:text-green-400"
-                        : "bg-slate-200 text-slate-500 dark:bg-slate-800 dark:text-slate-400"
+                        ? "bg-green-100 text-green-600 dark:bg-[#14d1a0]/15 dark:text-[#14d1a0]"
+                        : "bg-slate-200 text-slate-500 dark:bg-white/[0.05] dark:text-[#e3e3e3]/45"
                   }`}
                 >
                   {module.status === "completed" ? (
-                    <CheckCircle2 className={compact ? "size-4" : "size-5"} />
+                    <CheckCircle2 className={compact ? "size-4" : "size-5"} strokeWidth={1.75} />
                   ) : (
                     index + 1
                   )}
@@ -318,7 +319,7 @@ export function GuidePanel({ compact = false }: GuidePanelProps) {
                     {module.title}
                   </h3>
                   {!compact ? (
-                    <p className="text-sm font-normal leading-5 text-slate-500 dark:text-slate-400">
+                    <p className="text-sm font-normal leading-5 text-slate-500 dark:text-[#e3e3e3]/55">
                       {module.description}
                     </p>
                   ) : null}
@@ -327,7 +328,7 @@ export function GuidePanel({ compact = false }: GuidePanelProps) {
               {module.status === "current" && !compact ? (
                 <Button
                   size="sm"
-                  className="shrink-0 gap-1 rounded-full"
+                  className="shrink-0 gap-1 rounded-full premium-btn-primary"
                   onClick={() => {
                     const uncompletedFile = module.files.find(
                       (f) => !completedFiles.has(f.path)
@@ -337,7 +338,7 @@ export function GuidePanel({ compact = false }: GuidePanelProps) {
                     }
                   }}
                 >
-                  <PlayCircle className="size-4" />
+                  <PlayCircle className="size-4" strokeWidth={1.5} />
                   {module.files.some((f) => completedFiles.has(f.path))
                     ? "Continue Module"
                     : "Start Module"}
@@ -345,7 +346,7 @@ export function GuidePanel({ compact = false }: GuidePanelProps) {
               ) : null}
             </div>
 
-            <div className={compact ? "space-y-1.5" : "ml-11 space-y-2"}>
+            <div className={compact ? "space-y-2" : "ml-12 space-y-2"}>
               {module.files.map((file) => (
                 <button
                   key={file.path}
@@ -353,22 +354,29 @@ export function GuidePanel({ compact = false }: GuidePanelProps) {
                   disabled={module.status === "locked"}
                   onClick={() => startModuleFile(file.path)}
                   className={`flex w-full items-center justify-between rounded-xl border text-left transition-colors ${
-                    compact ? "p-2" : "p-3"
+                    compact ? "p-2.5" : "p-3.5"
                   } ${
                     selectedFile?.path === file.path
-                      ? "border-blue-300 bg-blue-50 dark:border-blue-700 dark:bg-blue-950/40"
+                      ? "border-blue-300 bg-blue-50 dark:border-[#14d1a0]/40 dark:bg-[#14d1a0]/10"
                       : module.status === "locked"
                         ? "cursor-not-allowed border-transparent bg-transparent"
-                        : "border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-blue-700 dark:hover:bg-slate-800/80"
+                        : "border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50 dark:border-white/[0.06] dark:bg-white/[0.02] dark:hover:border-[#14d1a0]/30 dark:hover:bg-white/[0.04]"
                   }`}
                 >
-                  <div className="flex min-w-0 items-center gap-2">
+                  <div className="flex min-w-0 items-center gap-2.5">
                     {!compact ? (
-                      <FileTypeIcon
-                        fileName={file.name}
-                        className="size-8 rounded-lg"
-                        iconClassName="size-4"
-                      />
+                      <span className="relative flex size-8 shrink-0 items-center justify-center rounded-lg bg-slate-100 dark:bg-white/[0.04]">
+                        <span
+                          className={`size-2 rounded-full ${
+                            completedFiles.has(file.path)
+                              ? "bg-green-500 dark:bg-[#14d1a0] premium-status-saved"
+                              : selectedFile?.path === file.path
+                                ? "bg-amber-500 dark:bg-[#cc7a31] premium-status-modified"
+                                : "bg-slate-300 dark:bg-white/20"
+                          }`}
+                          aria-hidden
+                        />
+                      </span>
                     ) : null}
                     <div className="min-w-0">
                       <p
@@ -379,18 +387,18 @@ export function GuidePanel({ compact = false }: GuidePanelProps) {
                         {file.name}
                       </p>
                       {!compact ? (
-                        <p className="text-sm font-normal leading-5 text-slate-400 dark:text-slate-500">
+                        <p className="text-sm font-normal leading-5 text-slate-400 dark:text-[#e3e3e3]/40">
                           {file.path}
                         </p>
                       ) : null}
                     </div>
                   </div>
                   {isFileBusy(file.path) ? (
-                    <Loader2 className="size-4 shrink-0 animate-spin text-blue-500" />
+                    <Loader2 className="size-4 shrink-0 animate-spin text-blue-500 dark:text-[#14d1a0]" />
                   ) : completedFiles.has(file.path) ? (
-                    <CheckCircle2 className="size-4 shrink-0 text-green-500 dark:text-green-400" />
+                    <CheckCircle2 className="size-4 shrink-0 text-green-500 dark:text-[#14d1a0]" strokeWidth={1.75} />
                   ) : module.status !== "locked" ? (
-                    <ChevronRight className="size-4 shrink-0 text-slate-400" />
+                    <ChevronRight className="size-4 shrink-0 text-slate-400 dark:text-[#e3e3e3]/35" strokeWidth={1.5} />
                   ) : null}
                 </button>
               ))}
@@ -403,8 +411,8 @@ export function GuidePanel({ compact = false }: GuidePanelProps) {
 
   if (error) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center p-6 text-center">
-        <AlertCircle className="mb-4 size-12 text-red-500" />
+      <div className="flex flex-1 flex-col items-center justify-center p-8 text-center dark:bg-[#121212]">
+        <AlertCircle className="mb-4 size-12 text-red-500" strokeWidth={1.25} />
         <h2 className="text-xl font-semibold leading-7 text-[#1f1f1f] dark:text-[#e3e3e3]">
           Analysis Failed
         </h2>
@@ -412,7 +420,7 @@ export function GuidePanel({ compact = false }: GuidePanelProps) {
           {error}
         </p>
         <Button
-          className="mt-4"
+          className="mt-4 premium-btn-primary"
           onClick={() => {
             setError(null);
             setLearningPath(null);
@@ -427,15 +435,15 @@ export function GuidePanel({ compact = false }: GuidePanelProps) {
 
   if (compact) {
     return (
-      <div className="flex h-full flex-col bg-slate-50 dark:bg-slate-950">
+      <div className="flex h-full flex-col bg-slate-50 dark:bg-[#121212]">
         <div className="flex-1 overflow-auto">{learningPathSection}</div>
       </div>
     );
   }
 
   return (
-    <div className="flex h-full flex-col bg-slate-50 dark:bg-slate-950">
-      <div className="flex-1 overflow-auto p-6">
+    <div className="flex h-full flex-col bg-slate-50 dark:bg-[#0f0f0f]">
+      <div className="flex-1 overflow-auto p-8">
         <div className="mx-auto max-w-2xl space-y-6">
           {projectOverview ? (
             <ProjectOverview projectName={fileTree.name} overview={projectOverview} />

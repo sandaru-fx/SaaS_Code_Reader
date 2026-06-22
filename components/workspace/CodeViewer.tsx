@@ -37,10 +37,10 @@ export function CodeViewer() {
     const snippetName = getPasteSnippetFileName(pastedLanguage);
 
     return (
-      <main className="flex min-w-0 flex-1 flex-col bg-slate-50 dark:bg-slate-950">
-        <div className="flex h-14 shrink-0 items-center gap-3 border-b border-slate-200 bg-white px-4 dark:border-slate-800 dark:bg-slate-900">
-          <div className="flex size-8 items-center justify-center rounded-xl bg-blue-50 dark:bg-blue-950/50">
-            <ClipboardPaste className="size-3.5 shrink-0 text-blue-600 dark:text-blue-400" />
+      <main className="flex min-w-0 flex-1 flex-col bg-slate-50 dark:bg-[#0f0f0f]">
+        <div className="flex h-14 shrink-0 items-center gap-3 border-b border-slate-200 bg-white px-5 dark:border-white/[0.06] dark:bg-[#121212]">
+          <div className="flex size-8 items-center justify-center rounded-xl bg-blue-50 dark:bg-[#14d1a0]/10 dark:border dark:border-[#14d1a0]/20">
+            <ClipboardPaste className="size-3.5 shrink-0 text-blue-600 premium-accent" strokeWidth={1.5} />
           </div>
           <div className="min-w-0 flex-1">
             <FileBreadcrumbs
@@ -49,11 +49,11 @@ export function CodeViewer() {
             />
           </div>
           {lineCount > 0 ? (
-            <span className="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-[11px] text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+            <span className="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-[11px] text-slate-500 dark:bg-white/[0.04] dark:text-[#e3e3e3]/55">
               {lineCount} {lineCount === 1 ? "line" : "lines"}
             </span>
           ) : null}
-          <span className="shrink-0 rounded-full bg-slate-950 px-2.5 py-1 text-[10px] uppercase tracking-wide text-white dark:bg-slate-100 dark:text-slate-950">
+          <span className="shrink-0 rounded-full bg-slate-950 px-2.5 py-1 text-[10px] uppercase tracking-wide text-white premium-pill">
             {pastedLanguage}
           </span>
         </div>
@@ -71,17 +71,17 @@ export function CodeViewer() {
       : 0;
 
   return (
-    <main className="flex min-w-0 flex-1 flex-col bg-slate-50 dark:bg-slate-950">
-      <div className="flex h-14 shrink-0 items-center gap-3 border-b border-slate-200 bg-white px-4 dark:border-slate-800 dark:bg-slate-900">
+    <main className="flex min-w-0 flex-1 flex-col bg-slate-50 dark:bg-[#0f0f0f]">
+      <div className="flex h-14 shrink-0 items-center gap-3 border-b border-slate-200 bg-white px-5 dark:border-white/[0.06] dark:bg-[#121212]">
         {mode === "guide" && selectedFile ? (
           <Button
             type="button"
             variant="outline"
             size="sm"
-            className="h-8 shrink-0 gap-1 rounded-full px-3 text-xs"
+            className="h-8 shrink-0 gap-1 rounded-full px-3 text-xs dark:border-white/[0.08] dark:bg-white/[0.03] dark:text-[#e3e3e3]"
             onClick={exitGuideLesson}
           >
-            <ArrowLeft className="size-3.5" />
+            <ArrowLeft className="size-3.5" strokeWidth={1.5} />
             Overview
           </Button>
         ) : null}
@@ -92,7 +92,7 @@ export function CodeViewer() {
             iconClassName="size-3.5"
           />
         ) : (
-          <div className="flex size-8 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800" />
+          <div className="flex size-8 items-center justify-center rounded-xl bg-slate-100 dark:bg-white/[0.04]" />
         )}
         <div className="min-w-0 flex-1">
           <FileBreadcrumbs
@@ -101,24 +101,24 @@ export function CodeViewer() {
           />
         </div>
         {lineCount > 0 ? (
-          <span className="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-[11px] text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+          <span className="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-[11px] text-slate-500 dark:bg-white/[0.04] dark:text-[#e3e3e3]/55">
             {lineCount} {lineCount === 1 ? "line" : "lines"}
           </span>
         ) : null}
         {fileLanguage ? (
-          <span className="shrink-0 rounded-full bg-slate-950 px-2.5 py-1 text-[10px] uppercase tracking-wide text-white dark:bg-slate-100 dark:text-slate-950">
+          <span className="shrink-0 rounded-full bg-slate-950 px-2.5 py-1 text-[10px] uppercase tracking-wide text-white premium-pill">
             {fileLanguage}
           </span>
         ) : null}
         {mode === "guide" && (isReadingFile || isAnalyzing) ? (
-          <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-1 text-[11px] text-blue-700 dark:bg-blue-950/40 dark:text-blue-300">
-            <span className="size-1.5 animate-pulse rounded-full bg-blue-500" />
+          <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-1 text-[11px] text-blue-700 dark:bg-[#14d1a0]/10 dark:text-[#14d1a0]">
+            <span className="size-1.5 animate-pulse rounded-full bg-blue-500 dark:bg-[#14d1a0]" />
             {isAnalyzing ? "Analyzing..." : "Loading..."}
           </span>
         ) : null}
       </div>
 
-      <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-white/70 dark:bg-slate-900/70">
+      <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-white/70 dark:bg-[#121212]">
         {showOnboarding && !selectedFile && !fileTree ? (
           <WorkspaceOnboarding onDismiss={dismissOnboarding} />
         ) : !selectedFile ? (
