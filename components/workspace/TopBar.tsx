@@ -18,6 +18,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { UsageBadge } from "@/components/workspace/UsageBadge";
 import { useWorkspace } from "@/components/workspace/WorkspaceProvider";
 import { isClerkPublishableKeySet } from "@/lib/clerk/is-configured";
 
@@ -127,6 +128,7 @@ export function TopBar({ onToggleTheme, isDark }: TopBarProps) {
       ) : null}
 
       <div className="ml-auto flex items-center gap-2">
+        <UsageBadge />
         <span className="hidden text-[11px] text-slate-400 lg:inline dark:text-[#e3e3e3]/40">
           Ctrl+Enter to analyze
         </span>

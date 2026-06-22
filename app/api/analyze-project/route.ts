@@ -6,6 +6,7 @@ import { isClerkConfigured } from "@/lib/clerk/is-configured";
 import { isGeminiError } from "@/lib/ai/errors";
 import type { AnalyzeErrorResponse } from "@/lib/ai/types";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { enforceUsageLimit, recordUsage } from "@/lib/usage";
 import type { AnalyzeProjectRequestBody } from "@/lib/ai/project-types";
 
 function geminiErrorStatus(code: string): number {
@@ -39,14 +40,22 @@ export async function POST(request: Request) {
     });
   }
 
+  let userId: string | null = null;
+
   if (isClerkConfigured()) {
-    const { userId } = await auth();
+    const authState = await auth();
+    userId = authState.userId;
 
     if (!userId) {
       const errorResponse: AnalyzeErrorResponse = {
         error: "Please sign in to analyze projects.",
       };
       return NextResponse.json(errorResponse, { status: 401 });
+    }
+
+    const usageBlock = await enforceUsageLimit(userId, "analyze_project");
+    if (usageBlock) {
+      return usageBlock;
     }
   }
 
@@ -70,6 +79,11 @@ export async function POST(request: Request) {
 
   try {
     const analysis = await analyzeProject(body);
+
+    if (userId) {
+      await recordUsage(userId, "analyze_project");
+    }
+
     return NextResponse.json(analysis);
   } catch (error) {
     if (isGeminiError(error)) {

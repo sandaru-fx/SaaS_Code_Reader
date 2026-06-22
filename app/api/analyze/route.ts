@@ -13,6 +13,7 @@ import {
   validateAnalyzeRequest,
 } from "@/lib/ai/validate-request";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { enforceUsageLimit, recordUsage } from "@/lib/usage";
 import { saveAnalysis } from "@/lib/supabase/analyses";
 import { getAnalysisOwner } from "@/lib/supabase/owner";
 import { isSupabaseConfigured } from "@/lib/supabase/is-configured";
@@ -59,14 +60,22 @@ export async function POST(request: Request) {
     });
   }
 
+  let userId: string | null = null;
+
   if (isClerkConfigured()) {
-    const { userId } = await auth();
+    const authState = await auth();
+    userId = authState.userId;
 
     if (!userId) {
       const errorResponse: AnalyzeErrorResponse = {
         error: "Please sign in to analyze code.",
       };
       return NextResponse.json(errorResponse, { status: 401 });
+    }
+
+    const usageBlock = await enforceUsageLimit(userId, "analyze");
+    if (usageBlock) {
+      return usageBlock;
     }
   }
 
@@ -112,6 +121,10 @@ export async function POST(request: Request) {
         explanation: analysis.explanation,
         mermaid: analysis.mermaid,
       });
+    }
+
+    if (userId) {
+      await recordUsage(userId, "analyze");
     }
 
     return NextResponse.json(analysis);

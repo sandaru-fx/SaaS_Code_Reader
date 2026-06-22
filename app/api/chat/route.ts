@@ -8,6 +8,7 @@ import { isGeminiError } from "@/lib/ai/errors";
 import { isGeminiConfigured } from "@/lib/ai/validate-request";
 import { validateChatRequest } from "@/lib/ai/validate-chat-request";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { enforceUsageLimit, recordUsage } from "@/lib/usage";
 
 function geminiErrorStatus(code: string): number {
   switch (code) {
@@ -50,14 +51,22 @@ export async function POST(request: Request) {
     });
   }
 
+  let userId: string | null = null;
+
   if (isClerkConfigured()) {
-    const { userId } = await auth();
+    const authState = await auth();
+    userId = authState.userId;
 
     if (!userId) {
       const errorResponse: ChatErrorResponse = {
         error: "Please sign in to use AI chat.",
       };
       return NextResponse.json(errorResponse, { status: 401 });
+    }
+
+    const usageBlock = await enforceUsageLimit(userId, "chat");
+    if (usageBlock) {
+      return usageBlock;
     }
   }
 
@@ -90,6 +99,11 @@ export async function POST(request: Request) {
 
   try {
     const response = await sendChatMessage(validation.data);
+
+    if (userId) {
+      await recordUsage(userId, "chat");
+    }
+
     return NextResponse.json(response);
   } catch (error) {
     if (isGeminiError(error)) {
