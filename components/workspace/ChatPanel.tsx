@@ -1,12 +1,23 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { X, Send, Bot, User, Loader2, Code2, Sparkles } from "lucide-react";
+import { useRef, useEffect, useState } from "react";
+import {
+  X,
+  Send,
+  Bot,
+  User,
+  Loader2,
+  Code2,
+  Sparkles,
+  Trash2,
+} from "lucide-react";
 import { useWorkspace } from "@/components/workspace/WorkspaceProvider";
 import { Button } from "@/components/ui/button";
 import { getAnalyzeErrorMessage } from "@/lib/ai/get-analyze-error-message";
 import { MarkdownExplanation } from "@/components/workspace/MarkdownExplanation";
-import type { ChatMessage, ChatContext } from "@/lib/ai/chat-types";
+import { useChatHistory } from "@/components/workspace/useChatHistory";
+import { toApiMessages, createChatMessageId } from "@/lib/workspace/chat-storage";
+import type { ChatContext } from "@/lib/ai/chat-types";
 
 function getContextLabel(type: ChatContext["type"]) {
   switch (type) {
@@ -19,9 +30,22 @@ function getContextLabel(type: ChatContext["type"]) {
   }
 }
 
+function getChatScope(
+  projectName: string | undefined,
+  mode: "folder" | "paste" | "guide"
+): string {
+  if (projectName) {
+    return projectName;
+  }
+
+  return mode === "paste" ? "paste" : "workspace";
+}
+
 export function ChatPanel() {
-  const { isChatOpen, closeChat, chatContext } = useWorkspace();
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const { isChatOpen, closeChat, chatContext, fileTree, mode } = useWorkspace();
+  const chatScope = getChatScope(fileTree?.name, mode);
+  const { messages, setMessages, clearMessages, hydrated } =
+    useChatHistory(chatScope);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -30,23 +54,19 @@ export function ChatPanel() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading]);
 
-  useEffect(() => {
-    if (!isChatOpen) {
-      setMessages([]);
-      setInput("");
-      setIsLoading(false);
-    }
-  }, [isChatOpen]);
-
   if (!isChatOpen) return null;
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
 
     const userMessage = input.trim();
-    const nextMessages: ChatMessage[] = [
+    const nextMessages = [
       ...messages,
-      { role: "user", content: userMessage },
+      {
+        id: createChatMessageId(),
+        role: "user" as const,
+        content: userMessage,
+      },
     ];
 
     setInput("");
@@ -60,7 +80,7 @@ export function ChatPanel() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          messages: nextMessages,
+          messages: toApiMessages(nextMessages),
           context: chatContext ?? undefined,
         }),
       });
@@ -76,14 +96,28 @@ export function ChatPanel() {
         throw new Error("Chat returned an invalid response.");
       }
 
-      setMessages((prev) => [...prev, { role: "ai", content: data.message! }]);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: createChatMessageId(),
+          role: "ai",
+          content: data.message!,
+        },
+      ]);
     } catch (error) {
       const message =
         error instanceof Error
           ? error.message
           : "Sorry, I encountered an error while processing your request.";
 
-      setMessages((prev) => [...prev, { role: "ai", content: message }]);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: createChatMessageId(),
+          role: "ai",
+          content: message,
+        },
+      ]);
     } finally {
       setIsLoading(false);
     }
@@ -103,18 +137,40 @@ export function ChatPanel() {
           <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-100 text-blue-600 dark:bg-[#14d1a0]/15 dark:text-[#14d1a0] dark:border dark:border-[#14d1a0]/25">
             <Bot className="h-4 w-4" strokeWidth={1.5} />
           </div>
-          <h3 className="text-sm font-medium text-slate-900 dark:text-[#e3e3e3]">
-            AI Chat
-          </h3>
+          <div>
+            <h3 className="text-sm font-medium text-slate-900 dark:text-[#e3e3e3]">
+              AI Chat
+            </h3>
+            {fileTree ? (
+              <p className="text-[10px] text-slate-500 dark:text-[#e3e3e3]/45">
+                History saved for {fileTree.name}
+              </p>
+            ) : null}
+          </div>
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-7 w-7 text-slate-500 hover:text-slate-900 dark:text-[#e3e3e3]/55 dark:hover:bg-white/[0.05] dark:hover:text-[#e3e3e3]"
-          onClick={closeChat}
-        >
-          <X className="h-4 w-4" strokeWidth={1.5} />
-        </Button>
+        <div className="flex items-center gap-1">
+          {messages.length > 0 ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 text-slate-500 hover:text-slate-900 dark:text-[#e3e3e3]/55 dark:hover:bg-white/[0.05] dark:hover:text-[#e3e3e3]"
+              onClick={clearMessages}
+              aria-label="Clear chat history"
+              title="Clear chat history"
+            >
+              <Trash2 className="h-4 w-4" strokeWidth={1.5} />
+            </Button>
+          ) : null}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7 text-slate-500 hover:text-slate-900 dark:text-[#e3e3e3]/55 dark:hover:bg-white/[0.05] dark:hover:text-[#e3e3e3]"
+            onClick={closeChat}
+            aria-label="Close chat"
+          >
+            <X className="h-4 w-4" strokeWidth={1.5} />
+          </Button>
+        </div>
       </div>
 
       {chatContext ? (
@@ -138,7 +194,11 @@ export function ChatPanel() {
       ) : null}
 
       <div className="flex-1 space-y-4 overflow-y-auto p-5">
-        {messages.length === 0 ? (
+        {!hydrated ? (
+          <div className="flex h-full items-center justify-center">
+            <Loader2 className="size-5 animate-spin text-slate-400 dark:text-[#14d1a0]" />
+          </div>
+        ) : messages.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center space-y-3 text-center text-slate-500 dark:text-[#e3e3e3]/55">
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 dark:bg-white/[0.04] dark:border dark:border-white/[0.06]">
               <Bot className="h-6 w-6 text-slate-400 premium-accent" strokeWidth={1.25} />
@@ -154,9 +214,9 @@ export function ChatPanel() {
             </div>
           </div>
         ) : (
-          messages.map((msg, idx) => (
+          messages.map((msg) => (
             <div
-              key={idx}
+              key={msg.id}
               className={`flex gap-3 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}
             >
               <div
@@ -216,7 +276,7 @@ export function ChatPanel() {
             size="icon"
             className="mb-1 mr-1 h-8 w-8 shrink-0 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 premium-btn-primary"
             onClick={() => void handleSend()}
-            disabled={!input.trim() || isLoading}
+            disabled={!input.trim() || isLoading || !hydrated}
           >
             <Send className="h-4 w-4" strokeWidth={1.5} />
           </Button>
