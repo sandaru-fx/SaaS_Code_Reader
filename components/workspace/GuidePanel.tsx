@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
+  ArrowLeft,
   BookOpen,
   CheckCircle2,
   ChevronRight,
@@ -29,13 +30,18 @@ export function GuidePanel({ compact = false }: GuidePanelProps) {
     canAnalyze,
     analysisResult,
     loadCachedAnalysis,
+    isReadingFile,
+    isAnalyzing: isAnalyzingFile,
+    showToast,
+    exitGuideLesson,
   } = useWorkspace();
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isAnalyzingProject, setIsAnalyzingProject] = useState(false);
   const [learningPath, setLearningPath] = useState<LearningModule[] | null>(null);
   const [projectOverview, setProjectOverview] = useState<ProjectOverviewData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [fileToAutoAnalyze, setFileToAutoAnalyze] = useState<string | null>(null);
   const [completedFiles, setCompletedFiles] = useState<Set<string>>(new Set());
+  const moduleStatusRef = useRef<Record<string, string>>({});
 
   useEffect(() => {
     if (analysisResult && selectedFile) {
@@ -65,6 +71,23 @@ export function GuidePanel({ compact = false }: GuidePanelProps) {
   });
 
   useEffect(() => {
+    if (!derivedLearningPath) {
+      return;
+    }
+
+    for (const module of derivedLearningPath) {
+      const previousStatus = moduleStatusRef.current[module.id];
+      if (previousStatus && previousStatus !== "completed" && module.status === "completed") {
+        showToast({
+          title: `Module complete: ${module.title}`,
+          description: "Nice work! The next module is now unlocked.",
+        });
+      }
+      moduleStatusRef.current[module.id] = module.status;
+    }
+  }, [derivedLearningPath, showToast]);
+
+  useEffect(() => {
     if (!fileToAutoAnalyze || selectedFile?.path !== fileToAutoAnalyze) {
       return;
     }
@@ -87,10 +110,10 @@ export function GuidePanel({ compact = false }: GuidePanelProps) {
   ]);
 
   useEffect(() => {
-    if (!fileTree || learningPath || isAnalyzing) return;
+    if (!fileTree || learningPath || isAnalyzingProject) return;
 
     async function analyzeProjectStructure() {
-      setIsAnalyzing(true);
+      setIsAnalyzingProject(true);
       setError(null);
 
       try {
@@ -146,12 +169,15 @@ export function GuidePanel({ compact = false }: GuidePanelProps) {
       } catch (err) {
         setError(err instanceof Error ? err.message : "An unknown error occurred.");
       } finally {
-        setIsAnalyzing(false);
+        setIsAnalyzingProject(false);
       }
     }
 
     void analyzeProjectStructure();
-  }, [fileTree, learningPath, isAnalyzing]);
+  }, [fileTree, learningPath, isAnalyzingProject]);
+
+  const isFileBusy = (path: string) =>
+    selectedFile?.path === path && (isReadingFile || isAnalyzingFile);
 
   if (!fileTree) {
     return (
@@ -168,7 +194,7 @@ export function GuidePanel({ compact = false }: GuidePanelProps) {
     );
   }
 
-  if (isAnalyzing) {
+  if (isAnalyzingProject) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center p-6 text-center">
         <Loader2 className="mb-4 size-8 animate-spin text-blue-500" />
@@ -207,13 +233,36 @@ export function GuidePanel({ compact = false }: GuidePanelProps) {
           </p>
         </>
       ) : (
-        <div className="mb-3 border-b border-slate-200 px-4 py-3 dark:border-slate-800">
-          <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400">
-            <BookOpen className="size-4" />
-            <h2 className="text-sm font-semibold text-[#1f1f1f] dark:text-[#e3e3e3]">
-              Learning Path
-            </h2>
+        <div className="mb-3 border-b border-slate-200 dark:border-slate-800">
+          <div className="flex items-center justify-between gap-2 px-4 py-3">
+            <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400">
+              <BookOpen className="size-4" />
+              <h2 className="text-sm font-semibold text-[#1f1f1f] dark:text-[#e3e3e3]">
+                Learning Path
+              </h2>
+            </div>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-7 gap-1 rounded-full px-2 text-xs text-slate-600 dark:text-slate-300"
+              onClick={exitGuideLesson}
+            >
+              <ArrowLeft className="size-3.5" />
+              Overview
+            </Button>
           </div>
+          {isAnalyzingFile && selectedFile ? (
+            <div className="flex items-center gap-2 border-t border-slate-100 bg-blue-50/60 px-4 py-2 text-xs text-blue-700 dark:border-slate-800 dark:bg-blue-950/30 dark:text-blue-300">
+              <Loader2 className="size-3.5 animate-spin" />
+              Analyzing {selectedFile.name}...
+            </div>
+          ) : isReadingFile && selectedFile ? (
+            <div className="flex items-center gap-2 border-t border-slate-100 bg-slate-50 px-4 py-2 text-xs text-slate-600 dark:border-slate-800 dark:bg-slate-900/50 dark:text-slate-300">
+              <Loader2 className="size-3.5 animate-spin" />
+              Loading {selectedFile.name}...
+            </div>
+          ) : null}
         </div>
       )}
 
@@ -336,7 +385,9 @@ export function GuidePanel({ compact = false }: GuidePanelProps) {
                       ) : null}
                     </div>
                   </div>
-                  {completedFiles.has(file.path) ? (
+                  {isFileBusy(file.path) ? (
+                    <Loader2 className="size-4 shrink-0 animate-spin text-blue-500" />
+                  ) : completedFiles.has(file.path) ? (
                     <CheckCircle2 className="size-4 shrink-0 text-green-500 dark:text-green-400" />
                   ) : module.status !== "locked" ? (
                     <ChevronRight className="size-4 shrink-0 text-slate-400" />

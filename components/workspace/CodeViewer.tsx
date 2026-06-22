@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertCircle, FileCode2, ClipboardPaste } from "lucide-react";
+import { AlertCircle, ArrowLeft, FileCode2, ClipboardPaste } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { CodeBlock } from "@/components/workspace/CodeBlock";
@@ -27,6 +27,8 @@ export function CodeViewer() {
     dismissFileError,
     showOnboarding,
     dismissOnboarding,
+    exitGuideLesson,
+    isAnalyzing,
   } = useWorkspace();
 
   if (mode === "paste") {
@@ -71,6 +73,18 @@ export function CodeViewer() {
   return (
     <main className="flex min-w-0 flex-1 flex-col bg-slate-50 dark:bg-slate-950">
       <div className="flex h-14 shrink-0 items-center gap-3 border-b border-slate-200 bg-white px-4 dark:border-slate-800 dark:bg-slate-900">
+        {mode === "guide" && selectedFile ? (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="h-8 shrink-0 gap-1 rounded-full px-3 text-xs"
+            onClick={exitGuideLesson}
+          >
+            <ArrowLeft className="size-3.5" />
+            Overview
+          </Button>
+        ) : null}
         {selectedFile ? (
           <FileTypeIcon
             fileName={selectedFile.name}
@@ -94,6 +108,12 @@ export function CodeViewer() {
         {fileLanguage ? (
           <span className="shrink-0 rounded-full bg-slate-950 px-2.5 py-1 text-[10px] uppercase tracking-wide text-white dark:bg-slate-100 dark:text-slate-950">
             {fileLanguage}
+          </span>
+        ) : null}
+        {mode === "guide" && (isReadingFile || isAnalyzing) ? (
+          <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-1 text-[11px] text-blue-700 dark:bg-blue-950/40 dark:text-blue-300">
+            <span className="size-1.5 animate-pulse rounded-full bg-blue-500" />
+            {isAnalyzing ? "Analyzing..." : "Loading..."}
           </span>
         ) : null}
       </div>

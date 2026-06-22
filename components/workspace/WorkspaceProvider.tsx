@@ -82,6 +82,8 @@ type WorkspaceContextValue = {
   setSidebarTab: (tab: SidebarTab) => void;
   setAiPanelTab: (tab: AiPanelTab) => void;
   dismissAnalysisToast: () => void;
+  showToast: (toast: AnalysisToastState) => void;
+  exitGuideLesson: () => void;
   enterFocusMode: () => void;
   exitFocusMode: () => void;
   dismissOnboarding: () => void;
@@ -233,6 +235,12 @@ export function WorkspaceProvider({
 
   const showAnalysisToast = useCallback((toast: AnalysisToastState) => {
     setAnalysisToast(toast);
+  }, []);
+
+  const exitGuideLesson = useCallback(() => {
+    readingPathRef.current = null;
+    resetFileState(setSelectedFile, setFileContent, setFileLanguage, setFileError);
+    resetAnalysisState(setAnalysisResult, setAnalysisError);
   }, []);
 
   useEffect(() => {
@@ -712,6 +720,8 @@ export function WorkspaceProvider({
       setSidebarTab: updateSidebarTab,
       setAiPanelTab,
       dismissAnalysisToast,
+      showToast: showAnalysisToast,
+      exitGuideLesson,
       enterFocusMode,
       exitFocusMode,
       dismissOnboarding: dismissOnboardingPanel,
@@ -767,6 +777,8 @@ export function WorkspaceProvider({
       updateSidebarTab,
       setAiPanelTab,
       dismissAnalysisToast,
+      showAnalysisToast,
+      exitGuideLesson,
       enterFocusMode,
       exitFocusMode,
       dismissOnboardingPanel,
