@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   AlertCircle,
+  Download,
   Maximize2,
   Minimize2,
   RotateCcw,
@@ -12,6 +13,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { buildMermaidInkUrl, sanitizeMermaid } from "@/lib/mermaid";
+import { downloadFromUrl } from "@/lib/workspace/download-file";
 import { DiagramImageSkeleton } from "@/components/workspace/LoadingSkeletons";
 
 type MermaidDiagramProps = {
@@ -56,6 +58,7 @@ function DiagramError({
 function DiagramToolbar({
   zoom,
   isFullscreen,
+  mermaidSource,
   onZoomIn,
   onZoomOut,
   onReset,
@@ -63,13 +66,38 @@ function DiagramToolbar({
 }: {
   zoom: number;
   isFullscreen: boolean;
+  mermaidSource: string;
   onZoomIn: () => void;
   onZoomOut: () => void;
   onReset: () => void;
   onToggleFullscreen: () => void;
 }) {
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  const handleDownload = async (format: "img" | "svg") => {
+    const result = buildMermaidInkUrl(mermaidSource, format);
+
+    if (!result.success) {
+      return;
+    }
+
+    setIsDownloading(true);
+
+    try {
+      const extension = format === "svg" ? "svg" : "png";
+      const filename = `coderider-diagram.${extension}`;
+      const downloaded = await downloadFromUrl(result.url, filename);
+
+      if (!downloaded) {
+        window.open(result.url, "_blank", "noopener,noreferrer");
+      }
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   return (
-    <div className="flex items-center justify-between gap-2 rounded-xl border border-slate-200 bg-slate-50/90 p-1.5">
+    <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-slate-200 bg-slate-50/90 p-1.5 dark:border-slate-700 dark:bg-slate-800/90">
       <div className="flex items-center gap-1">
         <Button
           type="button"
@@ -126,6 +154,30 @@ function DiagramToolbar({
           </>
         )}
       </Button>
+      <div className="flex items-center gap-1">
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="h-8 rounded-lg px-2 text-xs"
+          disabled={isDownloading}
+          onClick={() => void handleDownload("img")}
+        >
+          <Download className="size-3.5" />
+          PNG
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="h-8 rounded-lg px-2 text-xs"
+          disabled={isDownloading}
+          onClick={() => void handleDownload("svg")}
+        >
+          <Download className="size-3.5" />
+          SVG
+        </Button>
+      </div>
     </div>
   );
 }
@@ -149,6 +201,7 @@ export function MermaidDiagram({ mermaid }: MermaidDiagramProps) {
         key={diagram.url}
         url={diagram.url}
         source={diagram.sanitized}
+        mermaidSource={mermaid}
       />
       <MermaidSource source={diagram.sanitized} />
     </div>
@@ -158,9 +211,11 @@ export function MermaidDiagram({ mermaid }: MermaidDiagramProps) {
 function MermaidDiagramCanvas({
   url,
   source,
+  mermaidSource,
 }: {
   url: string;
   source: string;
+  mermaidSource: string;
 }) {
   const [zoom, setZoom] = useState(1);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -221,13 +276,14 @@ function MermaidDiagramCanvas({
       <DiagramToolbar
         zoom={zoom}
         isFullscreen={isFullscreen}
+        mermaidSource={mermaidSource}
         onZoomIn={zoomIn}
         onZoomOut={zoomOut}
         onReset={resetZoom}
         onToggleFullscreen={toggleFullscreen}
       />
       <div
-        className={`overflow-auto rounded-xl border border-slate-200 bg-white ${
+        className={`overflow-auto rounded-xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 ${
           isFullscreen ? "max-h-[calc(100vh-8rem)] flex-1" : "max-h-[min(70vh,560px)] min-h-[320px]"
         }`}
       >

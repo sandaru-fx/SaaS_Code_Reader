@@ -3,11 +3,11 @@
 import { useState } from "react";
 import {
   ChevronRight,
-  File,
   Folder,
   FolderOpen,
 } from "lucide-react";
 
+import { FileTypeIcon } from "@/components/workspace/FileTypeIcon";
 import { cn } from "@/lib/utils";
 import type { FileNode } from "@/lib/file-system/types";
 
@@ -46,9 +46,9 @@ export function FileTreeItem({
         type="button"
         onClick={handleClick}
         className={cn(
-          "flex w-full items-center gap-1 rounded-md py-1 pr-2 text-left text-sm transition-colors hover:bg-accent/60",
-          isSelected && "bg-accent text-accent-foreground",
-          !isSelected && "text-foreground/80"
+          "flex w-full items-center gap-1.5 rounded-lg py-1.5 pr-2 text-left text-sm transition-colors hover:bg-slate-100",
+          isSelected && "bg-blue-50 text-blue-900",
+          !isSelected && "text-slate-700"
         )}
         style={{ paddingLeft: `${depth * 12 + 8}px` }}
         title={node.path || node.name}
@@ -56,7 +56,7 @@ export function FileTreeItem({
         {isFolder ? (
           <ChevronRight
             className={cn(
-              "size-3.5 shrink-0 text-muted-foreground transition-transform",
+              "size-3.5 shrink-0 text-slate-400 transition-transform",
               hasChildren && isExpanded && "rotate-90",
               !hasChildren && "opacity-0"
             )}
@@ -67,12 +67,12 @@ export function FileTreeItem({
 
         {isFolder ? (
           isExpanded ? (
-            <FolderOpen className="size-3.5 shrink-0 text-amber-500/80" />
+            <FolderOpen className="size-4 shrink-0 text-amber-500" />
           ) : (
-            <Folder className="size-3.5 shrink-0 text-amber-500/80" />
+            <Folder className="size-4 shrink-0 text-amber-500" />
           )
         ) : (
-          <File className="size-3.5 shrink-0 text-muted-foreground" />
+          <FileTypeIcon fileName={node.name} />
         )}
 
         <span className="truncate">{node.name}</span>

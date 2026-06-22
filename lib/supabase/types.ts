@@ -16,6 +16,7 @@ export type AnalysisHistoryItem = {
   language: string;
   createdAt: string;
   preview: string;
+  mermaid?: string;
 };
 
 export type SaveAnalysisInput = {
@@ -37,5 +38,6 @@ export function toHistoryItem(row: SavedAnalysis): AnalysisHistoryItem {
     language: row.language,
     createdAt: row.created_at,
     preview: preview.length < row.explanation.trim().length ? `${preview}...` : preview,
+    mermaid: row.mermaid || undefined,
   };
 }

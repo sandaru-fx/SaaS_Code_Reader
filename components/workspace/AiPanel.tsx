@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CopyButton } from "@/components/workspace/CopyButton";
 import { EmptyState } from "@/components/workspace/EmptyState";
 import {
   DiagramPanelSkeleton,
@@ -14,6 +15,7 @@ import {
 import { MarkdownExplanation } from "@/components/workspace/MarkdownExplanation";
 import { MermaidDiagram } from "@/components/workspace/MermaidDiagram";
 import { useWorkspace } from "@/components/workspace/WorkspaceProvider";
+import { downloadTextFile } from "@/lib/workspace/download-file";
 
 function AnalysisErrorState({
   message,
@@ -72,18 +74,24 @@ export function AiPanel() {
     analysisError,
     aiPanelTab,
     setAiPanelTab,
+    isFocusMode,
     dismissAnalysisError,
   } = useWorkspace();
 
   return (
-    <aside className="flex h-full min-h-0 w-[min(100%,520px)] min-w-[420px] shrink-0 flex-col border-l border-slate-200 bg-white">
+    <aside className="flex h-full min-h-0 w-full flex-col border-l border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+      {isFocusMode ? (
+        <div className="border-b border-blue-100 bg-blue-50 px-4 py-2 text-center text-[11px] font-medium text-blue-700 dark:border-blue-900 dark:bg-blue-950/50 dark:text-blue-300">
+          Focus mode — diagram expanded for easier review
+        </div>
+      ) : null}
       <Tabs
         value={aiPanelTab}
         onValueChange={(value) => setAiPanelTab(value as "diagram" | "explanation")}
         className="flex h-full min-h-0 flex-col gap-0"
       >
-        <div className="flex h-14 shrink-0 items-center bg-white px-4">
-          <TabsList className="h-9 w-full rounded-full bg-slate-100 p-1">
+        <div className="flex h-14 shrink-0 items-center bg-white px-4 dark:bg-slate-900">
+          <TabsList className="h-9 w-full rounded-full bg-slate-100 p-1 dark:bg-slate-800">
             <TabsTrigger value="diagram" className="flex-1">
               <GitBranch className="size-3.5" />
               Diagram
@@ -146,13 +154,36 @@ export function AiPanel() {
               />
             ) : analysisResult ? (
               <div className="space-y-4 p-5">
-                <div>
-                  <p className="text-sm font-semibold text-slate-900">
-                    AI Explanation
-                  </p>
-                  <p className="text-xs text-slate-500">
-                    Step-by-step walkthrough of the logic
-                  </p>
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                      AI Explanation
+                    </p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Step-by-step walkthrough of the logic
+                    </p>
+                  </div>
+                  <div className="flex shrink-0 flex-wrap gap-2">
+                    <CopyButton
+                      text={analysisResult.explanation}
+                      label="Copy"
+                      className="h-8 rounded-full text-xs"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-8 rounded-full text-xs"
+                      onClick={() =>
+                        downloadTextFile(
+                          analysisResult.explanation,
+                          "coderider-explanation.md"
+                        )
+                      }
+                    >
+                      .md
+                    </Button>
+                  </div>
                 </div>
                 <MarkdownExplanation content={analysisResult.explanation} />
               </div>

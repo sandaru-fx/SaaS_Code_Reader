@@ -5,6 +5,7 @@ import { Clock3, FileCode2, Loader2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { EmptyState } from "@/components/workspace/EmptyState";
+import { HistoryDiagramThumb } from "@/components/workspace/HistoryDiagramThumb";
 import type { AnalysisHistoryItem } from "@/lib/supabase/types";
 
 function formatHistoryDate(value: string): string {
@@ -12,6 +13,24 @@ function formatHistoryDate(value: string): string {
 
   if (Number.isNaN(date.getTime())) {
     return "Unknown date";
+  }
+
+  const now = Date.now();
+  const diffMs = now - date.getTime();
+  const diffMinutes = Math.floor(diffMs / 60_000);
+
+  if (diffMinutes < 1) {
+    return "Just now";
+  }
+
+  if (diffMinutes < 60) {
+    return `${diffMinutes} min ago`;
+  }
+
+  const diffHours = Math.floor(diffMinutes / 60);
+
+  if (diffHours < 24) {
+    return `${diffHours} hr ago`;
   }
 
   return new Intl.DateTimeFormat(undefined, {
@@ -52,7 +71,7 @@ export function HistoryPanel({
       <EmptyState
         icon={Clock3}
         title="No saved analyses yet"
-        description="Run Analyze and your results will appear here after refresh."
+        description="Run Analyze and your results will appear here."
         className="min-h-[220px]"
       />
     );
@@ -79,7 +98,8 @@ export function HistoryPanel({
                 className="w-full text-left"
                 onClick={() => onSelect(item.id)}
               >
-                <div className="flex items-start gap-2">
+                <HistoryDiagramThumb mermaid={item.mermaid} />
+                <div className="mt-3 flex items-start gap-2">
                   <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-600">
                     <FileCode2 className="size-4" />
                   </span>

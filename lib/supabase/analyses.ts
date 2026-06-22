@@ -50,7 +50,7 @@ export async function listAnalyses(options: {
   const supabase = getSupabaseAdmin();
   let query = supabase
     .from("analyses")
-    .select("id, file_name, language, explanation, created_at")
+    .select("id, file_name, language, explanation, mermaid, created_at")
     .order("created_at", { ascending: false })
     .limit(HISTORY_LIMIT);
 
@@ -76,7 +76,7 @@ export async function listAnalyses(options: {
       language: row.language,
       code: "",
       explanation: row.explanation,
-      mermaid: "",
+      mermaid: row.mermaid ?? "",
       created_at: row.created_at,
     })
   );

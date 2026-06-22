@@ -31,6 +31,7 @@ import {
   SESSION_ID_HEADER,
 } from "@/lib/session/client-id";
 import type { AnalysisHistoryItem } from "@/lib/supabase/types";
+import { isOnboardingDismissed } from "@/lib/workspace/onboarding";
 
 type SidebarTab = "explorer" | "history";
 type AiPanelTab = "diagram" | "explanation";
@@ -46,6 +47,8 @@ type WorkspaceContextValue = {
   aiPanelTab: AiPanelTab;
   activeAnalyzeLabel: string | null;
   analysisToast: AnalysisToastState | null;
+  isFocusMode: boolean;
+  showOnboarding: boolean;
   fileTree: FileNode | null;
   selectedFile: FileNode | null;
   fileContent: string | null;
@@ -71,6 +74,9 @@ type WorkspaceContextValue = {
   setSidebarTab: (tab: SidebarTab) => void;
   setAiPanelTab: (tab: AiPanelTab) => void;
   dismissAnalysisToast: () => void;
+  enterFocusMode: () => void;
+  exitFocusMode: () => void;
+  dismissOnboarding: () => void;
   setPastedCode: (code: string) => void;
   setPastedLanguage: (language: string) => void;
   openFolder: () => Promise<void>;
@@ -137,6 +143,10 @@ export function WorkspaceProvider({
   const [analysisToast, setAnalysisToast] = useState<AnalysisToastState | null>(
     null
   );
+  const [isFocusMode, setIsFocusMode] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(
+    () => !isOnboardingDismissed()
+  );
   const [fileTree, setFileTree] = useState<FileNode | null>(null);
   const [selectedFile, setSelectedFile] = useState<FileNode | null>(null);
   const [fileContent, setFileContent] = useState<string | null>(null);
@@ -180,6 +190,18 @@ export function WorkspaceProvider({
     setAnalysisToast(null);
   }, []);
 
+  const enterFocusMode = useCallback(() => {
+    setIsFocusMode(true);
+  }, []);
+
+  const exitFocusMode = useCallback(() => {
+    setIsFocusMode(false);
+  }, []);
+
+  const dismissOnboardingPanel = useCallback(() => {
+    setShowOnboarding(false);
+  }, []);
+
   const showAnalysisToast = useCallback((toast: AnalysisToastState) => {
     setAnalysisToast(toast);
   }, []);
@@ -221,18 +243,20 @@ export function WorkspaceProvider({
 
   const switchToFolder = useCallback(() => {
     setMode("folder");
+    exitFocusMode();
     resetPasteState(setPastedCode, setPastedLanguage);
     resetAnalysisState(setAnalysisResult, setAnalysisError);
     setFolderSkippedCount(0);
-  }, []);
+  }, [exitFocusMode]);
 
   const switchToPaste = useCallback(() => {
     setMode("paste");
+    exitFocusMode();
     resetFileState(setSelectedFile, setFileContent, setFileLanguage, setFileError);
     readingPathRef.current = null;
     resetAnalysisState(setAnalysisResult, setAnalysisError);
     setFolderSkippedCount(0);
-  }, []);
+  }, [exitFocusMode]);
 
   const updatePastedCode = useCallback((code: string) => {
     setPastedCode(code);
@@ -253,6 +277,7 @@ export function WorkspaceProvider({
     }
 
     setMode("folder");
+    exitFocusMode();
     resetPasteState(setPastedCode, setPastedLanguage);
     setIsLoading(true);
     setError(null);
@@ -278,7 +303,7 @@ export function WorkspaceProvider({
     } finally {
       setIsLoading(false);
     }
-  }, [isSupported]);
+  }, [isSupported, exitFocusMode]);
 
   const dismissError = useCallback(() => {
     setError(null);
@@ -371,10 +396,11 @@ export function WorkspaceProvider({
       });
       setActiveHistoryId(id);
       setAiPanelTab("diagram");
+      enterFocusMode();
     } catch {
       setAnalysisError("Network error while loading saved analysis.");
     }
-  }, []);
+  }, [enterFocusMode]);
 
   const deleteHistoryItem = useCallback(
     async (id: string) => {
@@ -412,6 +438,7 @@ export function WorkspaceProvider({
     }
 
     setMode("folder");
+    exitFocusMode();
     resetPasteState(setPastedCode, setPastedLanguage);
     readingPathRef.current = node.path;
     setSelectedFile(node);
@@ -446,7 +473,7 @@ export function WorkspaceProvider({
         setIsReadingFile(false);
       }
     }
-  }, []);
+  }, [exitFocusMode]);
 
   const analyzeFile = useCallback(async () => {
     let code: string;
@@ -522,6 +549,7 @@ export function WorkspaceProvider({
         title: "Analysis complete",
         description: "Flowchart ready — saved to History.",
       });
+      enterFocusMode();
       void refreshHistory();
     } catch {
       setAnalysisError(
@@ -542,6 +570,7 @@ export function WorkspaceProvider({
     fileLanguage,
     refreshHistory,
     showAnalysisToast,
+    enterFocusMode,
   ]);
 
   const value = useMemo(
@@ -551,6 +580,8 @@ export function WorkspaceProvider({
       aiPanelTab,
       activeAnalyzeLabel,
       analysisToast,
+      isFocusMode,
+      showOnboarding,
       fileTree,
       selectedFile,
       fileContent,
@@ -576,6 +607,9 @@ export function WorkspaceProvider({
       setSidebarTab: updateSidebarTab,
       setAiPanelTab,
       dismissAnalysisToast,
+      enterFocusMode,
+      exitFocusMode,
+      dismissOnboarding: dismissOnboardingPanel,
       setPastedCode: updatePastedCode,
       setPastedLanguage: updatePastedLanguage,
       openFolder,
@@ -594,6 +628,8 @@ export function WorkspaceProvider({
       aiPanelTab,
       activeAnalyzeLabel,
       analysisToast,
+      isFocusMode,
+      showOnboarding,
       fileTree,
       selectedFile,
       fileContent,
@@ -619,6 +655,9 @@ export function WorkspaceProvider({
       updateSidebarTab,
       setAiPanelTab,
       dismissAnalysisToast,
+      enterFocusMode,
+      exitFocusMode,
+      dismissOnboardingPanel,
       updatePastedCode,
       updatePastedLanguage,
       openFolder,

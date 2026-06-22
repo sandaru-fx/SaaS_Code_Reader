@@ -14,7 +14,7 @@ function SidebarTabs() {
   const { sidebarTab, setSidebarTab } = useWorkspace();
 
   return (
-    <div className="grid grid-cols-2 gap-1 rounded-full bg-slate-100 p-1">
+    <div className="grid grid-cols-2 gap-1 rounded-full bg-slate-100 p-1 dark:bg-slate-800">
       <Button
         type="button"
         variant={sidebarTab === "explorer" ? "default" : "ghost"}
@@ -62,12 +62,12 @@ export function Sidebar() {
 
   if (sidebarTab === "history") {
     return (
-      <aside className="flex h-full min-h-0 w-[280px] shrink-0 flex-col border-r border-slate-200 bg-white">
-        <div className="space-y-3 border-b border-slate-200 px-4 py-3">
+      <aside className="flex h-full min-h-0 w-full flex-col border-r border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+        <div className="space-y-3 border-b border-slate-200 px-4 py-3 dark:border-slate-800">
           <SidebarTabs />
           <div>
-            <p className="text-sm font-semibold text-slate-900">Saved analyses</p>
-            <p className="text-[11px] text-slate-500">
+            <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Saved analyses</p>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400">
               Reopen previous AI results anytime
             </p>
           </div>
@@ -89,18 +89,18 @@ export function Sidebar() {
 
   if (mode === "paste") {
     return (
-      <aside className="flex h-full min-h-0 w-[280px] shrink-0 flex-col border-r border-slate-200 bg-white">
-        <div className="space-y-3 border-b border-slate-200 px-4 py-3">
+      <aside className="flex h-full min-h-0 w-full flex-col border-r border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+        <div className="space-y-3 border-b border-slate-200 px-4 py-3 dark:border-slate-800">
           <SidebarTabs />
           <div className="flex items-center gap-3">
-            <div className="flex size-9 items-center justify-center rounded-2xl bg-slate-100">
-              <ClipboardPaste className="size-4 shrink-0 text-slate-600" />
+            <div className="flex size-9 items-center justify-center rounded-2xl bg-slate-100 dark:bg-slate-800">
+              <ClipboardPaste className="size-4 shrink-0 text-slate-600 dark:text-slate-300" />
             </div>
             <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-slate-900">
+              <p className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
                 Quick Paste
               </p>
-              <p className="text-[11px] text-slate-500">Snippet workspace</p>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400">Snippet workspace</p>
             </div>
           </div>
         </div>
@@ -131,21 +131,21 @@ export function Sidebar() {
   const headerLabel = fileTree ? fileTree.name : "File Explorer";
 
   return (
-    <aside className="flex h-full min-h-0 w-[280px] shrink-0 flex-col border-r border-slate-200 bg-white">
-      <div className="space-y-3 border-b border-slate-200 px-4 py-3">
+    <aside className="flex h-full min-h-0 w-full flex-col border-r border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+      <div className="space-y-3 border-b border-slate-200 px-4 py-3 dark:border-slate-800">
         <SidebarTabs />
         <div className="flex items-center gap-3">
-          <div className="flex size-9 items-center justify-center rounded-2xl bg-slate-100">
-            <FolderTree className="size-4 shrink-0 text-slate-600" />
+          <div className="flex size-9 items-center justify-center rounded-2xl bg-slate-100 dark:bg-slate-800">
+            <FolderTree className="size-4 shrink-0 text-slate-600 dark:text-slate-300" />
           </div>
           <div className="min-w-0">
             <p
-              className="truncate text-sm font-semibold text-slate-900"
+              className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100"
               title={headerLabel}
             >
               {headerLabel}
             </p>
-            <p className="text-[11px] text-slate-500">Project explorer</p>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400">Project explorer</p>
           </div>
         </div>
       </div>
@@ -171,7 +171,7 @@ export function Sidebar() {
         ) : fileTree ? (
           <div className="min-h-0">
             {folderSkippedCount > 0 ? (
-              <p className="border-b border-slate-200 bg-amber-50 px-4 py-2 text-[11px] leading-4 text-amber-700">
+              <p className="border-b border-slate-200 bg-amber-50 px-4 py-2 text-[11px] leading-4 text-amber-700 dark:border-slate-800 dark:bg-amber-950/40 dark:text-amber-300">
                 Skipped {folderSkippedCount.toLocaleString()} entries such as
                 node_modules, .git, and binary files.
               </p>
