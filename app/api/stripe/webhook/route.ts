@@ -3,6 +3,7 @@ import type Stripe from "stripe";
 
 import { getStripeClient } from "@/lib/stripe/client";
 import { isStripeConfigured } from "@/lib/stripe/is-configured";
+import { getSubscriptionPeriod } from "@/lib/stripe/subscription-period";
 import { downgradeToFree, upsertProSubscription } from "@/lib/usage/usage";
 
 export const runtime = "nodejs";
@@ -57,13 +58,14 @@ export async function POST(request: Request) {
         const subscription = await stripe.subscriptions.retrieve(
           String(session.subscription)
         );
+        const period = getSubscriptionPeriod(subscription);
 
         await upsertProSubscription({
           userId,
           stripeCustomerId: String(session.customer),
           stripeSubscriptionId: subscription.id,
-          currentPeriodStart: new Date(subscription.current_period_start * 1000),
-          currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+          currentPeriodStart: period.currentPeriodStart,
+          currentPeriodEnd: period.currentPeriodEnd,
         });
         break;
       }
@@ -76,12 +78,14 @@ export async function POST(request: Request) {
         }
 
         if (subscription.status === "active" || subscription.status === "trialing") {
+          const period = getSubscriptionPeriod(subscription);
+
           await upsertProSubscription({
             userId,
             stripeCustomerId: String(subscription.customer),
             stripeSubscriptionId: subscription.id,
-            currentPeriodStart: new Date(subscription.current_period_start * 1000),
-            currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+            currentPeriodStart: period.currentPeriodStart,
+            currentPeriodEnd: period.currentPeriodEnd,
           });
         } else {
           await downgradeToFree(userId);

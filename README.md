@@ -44,8 +44,16 @@ Copy `.env.example` to `.env.local` and fill in:
 | `NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL` | Yes | `/workspace` |
 | `NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL` | Yes | `/workspace` |
 | `NEXT_PUBLIC_SITE_URL` | Optional | Production URL for SEO metadata |
+| `NEXT_PUBLIC_SUPABASE_URL` | For history + billing | Supabase project URL |
+| `SUPABASE_SERVICE_ROLE_KEY` | For history + billing | Server-side only — never expose to client |
+| `STRIPE_SECRET_KEY` | For billing | Stripe secret key |
+| `STRIPE_PRICE_ID` | For billing | Pro subscription price ID |
+| `STRIPE_WEBHOOK_SECRET` | For billing | Stripe webhook signing secret |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Optional | Stripe publishable key |
 
 Without Clerk keys, the app runs in open demo mode (workspace and analyze are accessible).
+
+Full production setup: [docs/deploy-production.md](./docs/deploy-production.md)
 
 ## Project Structure
 
@@ -70,6 +78,9 @@ lib/                  # Utilities
 - [x] Production deployment (Vercel)
 - [x] Launch polish (SEO, privacy, landing)
 - [x] Marketing kit + launch playbook (`docs/launch/`)
+- [x] AI Tutor / Guide Me learning path
+- [x] AI Chat with history + code highlighting
+- [x] Free-tier usage limits + Stripe billing
 - [x] **10-day MVP complete** — see [docs/MVP_COMPLETE.md](./docs/MVP_COMPLETE.md)
 
 ## Production
@@ -79,6 +90,8 @@ lib/                  # Utilities
 - **Privacy:** [coderider.vercel.app/privacy](https://coderider.vercel.app/privacy)
 
 To enable auth on production, add Clerk API keys in Vercel environment variables and allow `coderider.vercel.app` in the Clerk dashboard.
+
+For billing (usage limits + Stripe), also set Supabase and Stripe env vars and run migrations — see [docs/deploy-production.md](./docs/deploy-production.md).
 
 ## Launch kit
 

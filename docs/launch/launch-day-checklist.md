@@ -8,7 +8,8 @@ Run through this on launch day before publishing any posts.
 - [ ] **Privacy** — https://coderider.vercel.app/privacy loads
 - [ ] **Workspace** — https://coderider.vercel.app/workspace opens
 - [ ] **Paste mode** — https://coderider.vercel.app/workspace?mode=paste works
-- [ ] **API health** — https://coderider.vercel.app/api/analyze returns `geminiConfigured: true`
+- [ ] **Health** — https://coderider.vercel.app/api/health returns service flags
+- [ ] **Pricing** — https://coderider.vercel.app/pricing loads
 - [ ] **Analyze flow** — paste snippet → Analyze → diagram + explanation appear
 - [ ] **Mobile** — quick responsive check on phone
 - [ ] **Links** — GitHub, privacy, workspace CTAs all work
