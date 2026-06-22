@@ -284,7 +284,7 @@ function MermaidDiagramCanvas({
       />
       <div
         className={`overflow-auto rounded-xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 ${
-          isFullscreen ? "max-h-[calc(100vh-8rem)] flex-1" : "max-h-[min(70vh,560px)] min-h-[320px]"
+          isFullscreen ? "max-h-[calc(100vh-8rem)] flex-1" : "max-h-[min(80vh,640px)] min-h-[400px]"
         }`}
       >
         <div className="flex min-h-full min-w-full items-start justify-center p-4">

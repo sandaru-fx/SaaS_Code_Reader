@@ -17,6 +17,7 @@ export function LandingHeader() {
             variant="outline"
             size="sm"
             className="h-9 rounded-full border-slate-200 bg-white px-4 shadow-sm"
+            nativeButton={false}
             render={<Link href="/workspace" />}
           >
             Open Workspace
@@ -58,7 +59,8 @@ function LandingHeaderWithAuth() {
                 variant="outline"
                 size="sm"
                 className="h-9 rounded-full border-slate-200 bg-white px-4 shadow-sm"
-                render={<Link href="/workspace" />}
+                nativeButton={false}
+            render={<Link href="/workspace" />}
               >
                 Open Workspace
               </Button>
@@ -70,6 +72,7 @@ function LandingHeaderWithAuth() {
                 variant="ghost"
                 size="sm"
                 className="h-9 rounded-full px-4"
+                nativeButton={false}
                 render={<Link href="/sign-in" />}
               >
                 Sign In
@@ -77,6 +80,7 @@ function LandingHeaderWithAuth() {
               <Button
                 size="sm"
                 className="h-9 rounded-full px-4 shadow-sm"
+                nativeButton={false}
                 render={<Link href="/sign-up" />}
               >
                 Sign Up

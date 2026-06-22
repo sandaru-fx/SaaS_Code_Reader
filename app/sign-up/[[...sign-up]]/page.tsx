@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { SignUp } from "@clerk/nextjs";
 
+import { AuthShell } from "@/components/auth/AuthShell";
+import { clerkAppearance } from "@/lib/clerk/appearance";
 import { isClerkPublishableKeySet } from "@/lib/clerk/is-configured";
 
 export const metadata: Metadata = {
@@ -15,15 +17,11 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="flex min-h-full flex-1 items-center justify-center px-6 py-16">
-      <SignUp
-        appearance={{
-          elements: {
-            rootBox: "mx-auto w-full max-w-md",
-            card: "border border-border bg-card shadow-none",
-          },
-        }}
-      />
-    </div>
+    <AuthShell
+      title="Create your account"
+      description="Free to start — analyze code, save diagrams, and pick up where you left off."
+    >
+      <SignUp appearance={clerkAppearance} />
+    </AuthShell>
   );
 }

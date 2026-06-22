@@ -1,4 +1,10 @@
-export type WorkspaceMode = "folder" | "paste";
+export type WorkspaceMode = "folder" | "paste" | "guide";
+
+export interface ChatContextData {
+  type: "code" | "explanation" | "general";
+  content: string;
+  file?: string;
+}
 
 export const DEFAULT_PASTE_LANGUAGE = "javascript";
 

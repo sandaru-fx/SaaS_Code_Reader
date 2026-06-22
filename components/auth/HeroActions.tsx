@@ -13,6 +13,7 @@ function PublicWorkspaceActions() {
       <Button
         size="lg"
         className="h-12 rounded-full px-6 text-sm shadow-lg shadow-slate-950/15"
+        nativeButton={false}
         render={<Link href="/workspace" />}
       >
         Open Workspace Free
@@ -22,6 +23,7 @@ function PublicWorkspaceActions() {
         size="lg"
         variant="outline"
         className="h-12 rounded-full border-slate-200 bg-white/80 px-6 text-sm shadow-sm backdrop-blur"
+        nativeButton={false}
         render={<Link href="/workspace?mode=paste" />}
       >
         <ClipboardPaste />
@@ -52,6 +54,7 @@ function HeroActionsWithAuth() {
         <Button
           size="lg"
           className="h-12 rounded-full px-6 text-sm shadow-lg shadow-slate-950/15"
+          nativeButton={false}
           render={<Link href="/workspace" />}
         >
           Open Workspace Free
@@ -61,6 +64,7 @@ function HeroActionsWithAuth() {
           size="lg"
           variant="outline"
           className="h-12 rounded-full border-slate-200 bg-white/80 px-6 text-sm shadow-sm backdrop-blur"
+          nativeButton={false}
           render={<Link href="/workspace?mode=paste" />}
         >
           <ClipboardPaste />
@@ -75,6 +79,7 @@ function HeroActionsWithAuth() {
       <Button
         size="lg"
         className="h-12 rounded-full px-6 text-sm shadow-lg shadow-slate-950/15"
+        nativeButton={false}
         render={<Link href="/sign-up" />}
       >
         Get Started
@@ -84,6 +89,7 @@ function HeroActionsWithAuth() {
         size="lg"
         variant="outline"
         className="h-12 rounded-full border-slate-200 bg-white/80 px-6 text-sm shadow-sm backdrop-blur"
+        nativeButton={false}
         render={<Link href="/sign-in" />}
       >
         Sign In

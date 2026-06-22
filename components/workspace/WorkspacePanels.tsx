@@ -1,7 +1,9 @@
 "use client";
 
+import { ModeSelection } from "@/components/workspace/ModeSelection";
 import { AiPanel } from "@/components/workspace/AiPanel";
 import { CodeViewer } from "@/components/workspace/CodeViewer";
+import { GuidePanel } from "@/components/workspace/GuidePanel";
 import { ResizeHandle } from "@/components/workspace/ResizeHandle";
 import { Sidebar } from "@/components/workspace/Sidebar";
 import { usePanelLayout } from "@/components/workspace/usePanelLayout";
@@ -9,9 +11,13 @@ import { useWorkspace } from "@/components/workspace/WorkspaceProvider";
 import { AI_PANEL_MAX_WIDTH } from "@/lib/workspace/panel-layout";
 
 export function WorkspacePanels() {
-  const { isFocusMode } = useWorkspace();
+  const { isFocusMode, mode, fileTree } = useWorkspace();
   const { sidebarWidth, aiPanelWidth, resizeSidebar, resizeAiPanel } =
     usePanelLayout();
+
+  if (mode === "folder" && !fileTree) {
+    return <ModeSelection />;
+  }
 
   if (isFocusMode) {
     const focusAiWidth = Math.max(aiPanelWidth, AI_PANEL_MAX_WIDTH);
@@ -29,6 +35,25 @@ export function WorkspacePanels() {
           style={{ width: focusAiWidth }}
         >
           <AiPanel />
+        </div>
+      </div>
+    );
+  }
+
+  if (mode === "guide") {
+    return (
+      <div className="flex min-h-0 flex-1 overflow-hidden bg-slate-50/70">
+        <div
+          className="flex h-full min-h-0 shrink-0 flex-col overflow-hidden"
+          style={{ width: sidebarWidth }}
+        >
+          <Sidebar />
+        </div>
+
+        <ResizeHandle onResize={resizeSidebar} />
+
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+          <GuidePanel />
         </div>
       </div>
     );

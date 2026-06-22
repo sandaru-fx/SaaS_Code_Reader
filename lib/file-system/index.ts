@@ -21,7 +21,7 @@ export {
   shouldSkipEntry,
   shouldSkipFile,
 } from "@/lib/file-system/skip-rules";
-export { countFileNodes } from "@/lib/file-system/tree-utils";
+export { countFileNodes, serializeTreeForAI, findNodeByPath } from "@/lib/file-system/tree-utils";
 export {
   FileSystemAccessError,
   isFileSystemAccessError,

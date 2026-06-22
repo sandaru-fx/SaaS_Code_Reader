@@ -39,6 +39,7 @@ export function TopBar({ onToggleTheme, isDark }: TopBarProps) {
     exitFocusMode,
     switchToFolder,
     switchToPaste,
+    switchToGuide,
     openFolder,
     analyzeFile,
   } = useWorkspace();
@@ -75,13 +76,22 @@ export function TopBar({ onToggleTheme, isDark }: TopBarProps) {
       <div className="flex items-center rounded-full border border-slate-200 bg-slate-100 p-1 dark:border-slate-700 dark:bg-slate-800">
         <Button
           type="button"
+          variant={mode === "guide" ? "default" : "ghost"}
+          size="sm"
+          className="h-8 rounded-full px-3 text-xs"
+          onClick={switchToGuide}
+        >
+          Guide Me
+        </Button>
+        <Button
+          type="button"
           variant={mode === "folder" ? "default" : "ghost"}
           size="sm"
           className="h-8 rounded-full px-3 text-xs"
           onClick={switchToFolder}
         >
           <FolderOpen className="size-3.5" />
-          Folder
+          Explore
         </Button>
         <Button
           type="button"
@@ -91,7 +101,7 @@ export function TopBar({ onToggleTheme, isDark }: TopBarProps) {
           onClick={switchToPaste}
         >
           <ClipboardPaste className="size-3.5" />
-          Quick Paste
+          Paste
         </Button>
       </div>
 
@@ -142,6 +152,19 @@ export function TopBar({ onToggleTheme, isDark }: TopBarProps) {
             )}
           </Button>
         ) : null}
+        {mode === "guide" ? (
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-9 rounded-full border-slate-200 bg-white px-4 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+            disabled={!isSupported || isLoading}
+            onClick={openFolder}
+            suppressHydrationWarning
+          >
+            {isLoading ? <Loader2 className="animate-spin" /> : <FolderOpen />}
+            {isLoading ? "Opening..." : "Open Folder"}
+          </Button>
+        ) : null}
         {mode === "folder" ? (
           <Button
             variant="outline"
@@ -149,6 +172,7 @@ export function TopBar({ onToggleTheme, isDark }: TopBarProps) {
             className="h-9 rounded-full border-slate-200 bg-white px-4 shadow-sm dark:border-slate-700 dark:bg-slate-800"
             disabled={!isSupported || isLoading}
             onClick={openFolder}
+            suppressHydrationWarning
           >
             {isLoading ? <Loader2 className="animate-spin" /> : <FolderOpen />}
             {isLoading ? "Opening..." : "Open Folder"}

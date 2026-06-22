@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Roboto, Roboto_Mono } from "next/font/google";
 
 import { isClerkPublishableKeySet } from "@/lib/clerk/is-configured";
+import { clerkAppearance } from "@/lib/clerk/appearance";
 import {
   SITE_DESCRIPTION,
   SITE_NAME,
@@ -10,13 +11,14 @@ import {
 } from "@/lib/site";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const roboto = Roboto({
+  variable: "--font-roboto",
   subsets: ["latin"],
+  weight: ["400", "500", "700"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const robotoMono = Roboto_Mono({
+  variable: "--font-roboto-mono",
   subsets: ["latin"],
 });
 
@@ -75,9 +77,9 @@ export default function RootLayout({
   const content = (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${roboto.variable} ${robotoMono.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="flex min-h-full flex-col text-[#1f1f1f] dark:text-[#e3e3e3] font-sans">{children}</body>
     </html>
   );
 
@@ -85,5 +87,15 @@ export default function RootLayout({
     return content;
   }
 
-  return <ClerkProvider>{content}</ClerkProvider>;
+  return (
+    <ClerkProvider
+      appearance={clerkAppearance}
+      signInUrl="/sign-in"
+      signUpUrl="/sign-up"
+      signInFallbackRedirectUrl="/workspace"
+      signUpFallbackRedirectUrl="/workspace"
+    >
+      {content}
+    </ClerkProvider>
+  );
 }

@@ -16,6 +16,7 @@ import { getPasteSnippetFileName } from "@/components/workspace/paste-utils";
 import {
   DEFAULT_PASTE_LANGUAGE,
   type WorkspaceMode,
+  type ChatContextData,
 } from "@/components/workspace/types";
 import {
   isFileSystemAccessError,
@@ -69,8 +70,14 @@ type WorkspaceContextValue = {
   folderSkippedCount: number;
   canAnalyze: boolean;
   isSupported: boolean;
+  isChatOpen: boolean;
+  chatContext: ChatContextData | null;
+  openChat: (context?: ChatContextData) => void;
+  closeChat: () => void;
+  toggleChat: () => void;
   switchToFolder: () => void;
   switchToPaste: () => void;
+  switchToGuide: () => void;
   setSidebarTab: (tab: SidebarTab) => void;
   setAiPanelTab: (tab: AiPanelTab) => void;
   dismissAnalysisToast: () => void;
@@ -169,6 +176,8 @@ export function WorkspaceProvider({
   const [fileError, setFileError] = useState<string | null>(null);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
   const [folderSkippedCount, setFolderSkippedCount] = useState(0);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [chatContext, setChatContext] = useState<ChatContextData | null>(null);
   const readingPathRef = useRef<string | null>(null);
   const isSupported = useMemo(() => isFileSystemAccessSupported(), []);
   const pasteByteLength = useMemo(
@@ -200,6 +209,21 @@ export function WorkspaceProvider({
 
   const dismissOnboardingPanel = useCallback(() => {
     setShowOnboarding(false);
+  }, []);
+
+  const openChat = useCallback((context?: ChatContextData) => {
+    if (context) {
+      setChatContext(context);
+    }
+    setIsChatOpen(true);
+  }, []);
+
+  const closeChat = useCallback(() => {
+    setIsChatOpen(false);
+  }, []);
+
+  const toggleChat = useCallback(() => {
+    setIsChatOpen((prev) => !prev);
   }, []);
 
   const showAnalysisToast = useCallback((toast: AnalysisToastState) => {
@@ -254,6 +278,14 @@ export function WorkspaceProvider({
     exitFocusMode();
     resetFileState(setSelectedFile, setFileContent, setFileLanguage, setFileError);
     readingPathRef.current = null;
+    resetAnalysisState(setAnalysisResult, setAnalysisError);
+    setFolderSkippedCount(0);
+  }, [exitFocusMode]);
+
+  const switchToGuide = useCallback(() => {
+    setMode("guide");
+    exitFocusMode();
+    resetPasteState(setPastedCode, setPastedLanguage);
     resetAnalysisState(setAnalysisResult, setAnalysisError);
     setFolderSkippedCount(0);
   }, [exitFocusMode]);
@@ -602,8 +634,14 @@ export function WorkspaceProvider({
       folderSkippedCount,
       canAnalyze,
       isSupported,
+      isChatOpen,
+      chatContext,
+      openChat,
+      closeChat,
+      toggleChat,
       switchToFolder,
       switchToPaste,
+      switchToGuide,
       setSidebarTab: updateSidebarTab,
       setAiPanelTab,
       dismissAnalysisToast,
@@ -650,8 +688,14 @@ export function WorkspaceProvider({
       folderSkippedCount,
       canAnalyze,
       isSupported,
+      isChatOpen,
+      chatContext,
+      openChat,
+      closeChat,
+      toggleChat,
       switchToFolder,
       switchToPaste,
+      switchToGuide,
       updateSidebarTab,
       setAiPanelTab,
       dismissAnalysisToast,

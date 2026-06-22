@@ -31,7 +31,7 @@ export default function WorkspaceError({
       </div>
       <div className="flex flex-wrap items-center justify-center gap-2">
         <Button onClick={reset}>Try again</Button>
-        <Button variant="outline" render={<Link href="/" />}>
+        <Button variant="outline" nativeButton={false} render={<Link href="/" />}>
           Back to home
         </Button>
       </div>
