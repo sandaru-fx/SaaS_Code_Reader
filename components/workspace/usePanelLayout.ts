@@ -11,6 +11,9 @@ import {
   SIDEBAR_DEFAULT_WIDTH,
   SIDEBAR_WIDTH_KEY,
   storePanelWidth,
+  CHAT_PANEL_DEFAULT_WIDTH,
+  CHAT_PANEL_WIDTH_KEY,
+  clampChatPanelWidth,
 } from "@/lib/workspace/panel-layout";
 
 export function usePanelLayout() {
@@ -26,6 +29,13 @@ export function usePanelLayout() {
       AI_PANEL_WIDTH_KEY,
       AI_PANEL_DEFAULT_WIDTH,
       clampAiPanelWidth
+    )
+  );
+  const [chatPanelWidth, setChatPanelWidth] = useState(() =>
+    readStoredPanelWidth(
+      CHAT_PANEL_WIDTH_KEY,
+      CHAT_PANEL_DEFAULT_WIDTH,
+      clampChatPanelWidth
     )
   );
 
@@ -45,10 +55,20 @@ export function usePanelLayout() {
     });
   }, []);
 
+  const resizeChatPanel = useCallback((delta: number) => {
+    setChatPanelWidth((current) => {
+      const next = clampChatPanelWidth(current - delta);
+      storePanelWidth(CHAT_PANEL_WIDTH_KEY, next);
+      return next;
+    });
+  }, []);
+
   return {
     sidebarWidth,
     aiPanelWidth,
+    chatPanelWidth,
     resizeSidebar,
     resizeAiPanel,
+    resizeChatPanel,
   };
 }

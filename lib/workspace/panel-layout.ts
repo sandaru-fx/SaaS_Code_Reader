@@ -1,5 +1,6 @@
 export const SIDEBAR_WIDTH_KEY = "coderider-sidebar-width";
 export const AI_PANEL_WIDTH_KEY = "coderider-ai-panel-width";
+export const CHAT_PANEL_WIDTH_KEY = "coderider-chat-panel-width";
 
 export const SIDEBAR_MIN_WIDTH = 220;
 export const SIDEBAR_MAX_WIDTH = 420;
@@ -9,12 +10,20 @@ export const AI_PANEL_MIN_WIDTH = 360;
 export const AI_PANEL_MAX_WIDTH = 640;
 export const AI_PANEL_DEFAULT_WIDTH = 520;
 
+export const CHAT_PANEL_MIN_WIDTH = 300;
+export const CHAT_PANEL_MAX_WIDTH = 500;
+export const CHAT_PANEL_DEFAULT_WIDTH = 380;
+
 export function clampSidebarWidth(width: number): number {
   return Math.min(SIDEBAR_MAX_WIDTH, Math.max(SIDEBAR_MIN_WIDTH, width));
 }
 
 export function clampAiPanelWidth(width: number): number {
   return Math.min(AI_PANEL_MAX_WIDTH, Math.max(AI_PANEL_MIN_WIDTH, width));
+}
+
+export function clampChatPanelWidth(width: number): number {
+  return Math.min(CHAT_PANEL_MAX_WIDTH, Math.max(CHAT_PANEL_MIN_WIDTH, width));
 }
 
 export function readStoredPanelWidth(

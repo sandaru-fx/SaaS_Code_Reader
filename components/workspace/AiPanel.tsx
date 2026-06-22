@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertCircle, GitBranch, Sparkles } from "lucide-react";
+import { AlertCircle, GitBranch, Sparkles, MessageSquare } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -76,6 +76,7 @@ export function AiPanel() {
     setAiPanelTab,
     isFocusMode,
     dismissAnalysisError,
+    openChat,
   } = useWorkspace();
 
   return (
@@ -186,6 +187,17 @@ export function AiPanel() {
                   </div>
                 </div>
                 <MarkdownExplanation content={analysisResult.explanation} />
+                
+                <div className="mt-6 flex justify-center pb-4">
+                  <Button
+                    variant="outline"
+                    className="gap-2 rounded-full border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 hover:text-blue-800 dark:border-blue-900 dark:bg-blue-950/30 dark:text-blue-400 dark:hover:bg-blue-900/50 dark:hover:text-blue-300"
+                    onClick={() => openChat({ type: "explanation", content: analysisResult.explanation })}
+                  >
+                    <MessageSquare className="size-4" />
+                    Ask Follow-up Question
+                  </Button>
+                </div>
               </div>
             ) : (
               <EmptyState

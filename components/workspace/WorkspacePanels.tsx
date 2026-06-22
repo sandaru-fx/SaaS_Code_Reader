@@ -2,6 +2,7 @@
 
 import { ModeSelection } from "@/components/workspace/ModeSelection";
 import { AiPanel } from "@/components/workspace/AiPanel";
+import { ChatPanel } from "@/components/workspace/ChatPanel";
 import { CodeViewer } from "@/components/workspace/CodeViewer";
 import { GuidePanel } from "@/components/workspace/GuidePanel";
 import { ResizeHandle } from "@/components/workspace/ResizeHandle";
@@ -11,9 +12,15 @@ import { useWorkspace } from "@/components/workspace/WorkspaceProvider";
 import { AI_PANEL_MAX_WIDTH } from "@/lib/workspace/panel-layout";
 
 export function WorkspacePanels() {
-  const { isFocusMode, mode, fileTree } = useWorkspace();
-  const { sidebarWidth, aiPanelWidth, resizeSidebar, resizeAiPanel } =
-    usePanelLayout();
+  const { isFocusMode, mode, fileTree, isChatOpen } = useWorkspace();
+  const {
+    sidebarWidth,
+    aiPanelWidth,
+    chatPanelWidth,
+    resizeSidebar,
+    resizeAiPanel,
+    resizeChatPanel,
+  } = usePanelLayout();
 
   if (mode === "folder" && !fileTree) {
     return <ModeSelection />;
@@ -36,6 +43,18 @@ export function WorkspacePanels() {
         >
           <AiPanel />
         </div>
+
+        {isChatOpen && (
+          <>
+            <ResizeHandle onResize={resizeChatPanel} />
+            <div
+              className="flex h-full min-h-0 shrink-0 flex-col overflow-hidden shadow-xl shadow-slate-950/5"
+              style={{ width: chatPanelWidth }}
+            >
+              <ChatPanel />
+            </div>
+          </>
+        )}
       </div>
     );
   }
@@ -55,6 +74,18 @@ export function WorkspacePanels() {
         <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
           <GuidePanel />
         </div>
+
+        {isChatOpen && (
+          <>
+            <ResizeHandle onResize={resizeChatPanel} />
+            <div
+              className="flex h-full min-h-0 shrink-0 flex-col overflow-hidden shadow-xl shadow-slate-950/5 z-10"
+              style={{ width: chatPanelWidth }}
+            >
+              <ChatPanel />
+            </div>
+          </>
+        )}
       </div>
     );
   }
@@ -82,6 +113,18 @@ export function WorkspacePanels() {
       >
         <AiPanel />
       </div>
+
+      {isChatOpen && (
+        <>
+          <ResizeHandle onResize={resizeChatPanel} />
+          <div
+            className="flex h-full min-h-0 shrink-0 flex-col overflow-hidden shadow-xl shadow-slate-950/5 z-10"
+            style={{ width: chatPanelWidth }}
+          >
+            <ChatPanel />
+          </div>
+        </>
+      )}
     </div>
   );
 }
