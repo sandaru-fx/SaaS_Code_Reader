@@ -87,7 +87,7 @@ type WorkspaceContextValue = {
   setPastedCode: (code: string) => void;
   setPastedLanguage: (language: string) => void;
   openFolder: () => Promise<void>;
-  selectFile: (node: FileNode) => Promise<void>;
+  selectFile: (node: FileNode, autoAnalyze?: boolean) => Promise<void>;
   analyzeFile: () => Promise<void>;
   loadHistoryItem: (id: string) => Promise<void>;
   deleteHistoryItem: (id: string) => Promise<void>;
@@ -464,7 +464,7 @@ export function WorkspaceProvider({
     [activeHistoryId]
   );
 
-  const selectFile = useCallback(async (node: FileNode) => {
+  const selectFile = useCallback(async (node: FileNode, autoAnalyze = false) => {
     if (node.type !== "file") {
       return;
     }
@@ -489,6 +489,12 @@ export function WorkspaceProvider({
 
       setFileContent(result.content);
       setFileLanguage(result.language);
+      
+      // Auto-analyze if requested
+      if (autoAnalyze) {
+        // We can't call analyzeFile directly here because state hasn't updated yet
+        // We will handle this in GuidePanel instead by waiting for fileContent to update
+      }
     } catch (err) {
       if (readingPathRef.current !== node.path) {
         return;

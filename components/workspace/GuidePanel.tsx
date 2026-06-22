@@ -16,10 +16,49 @@ type LearningModule = {
 };
 
 export function GuidePanel() {
-  const { fileTree, selectFile } = useWorkspace();
+  const { fileTree, selectFile, analyzeFile, fileContent, selectedFile, canAnalyze } = useWorkspace();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [learningPath, setLearningPath] = useState<LearningModule[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [fileToAutoAnalyze, setFileToAutoAnalyze] = useState<string | null>(null);
+  const [completedFiles, setCompletedFiles] = useState<Set<string>>(new Set());
+
+  // Track completed files based on analysis results
+  const { analysisResult } = useWorkspace();
+  useEffect(() => {
+    if (analysisResult && selectedFile) {
+      setCompletedFiles((prev) => {
+        const next = new Set(prev);
+        next.add(selectedFile.path);
+        return next;
+      });
+    }
+  }, [analysisResult, selectedFile]);
+
+  // Update module statuses based on completed files
+  const derivedLearningPath = learningPath?.map((module, index, array) => {
+    const isCompleted = module.files.every((f) => completedFiles.has(f.path));
+    
+    // First module is current if not completed.
+    // Subsequent modules are current if the previous is completed and this one isn't.
+    let status: "locked" | "current" | "completed" = "locked";
+    
+    if (isCompleted) {
+      status = "completed";
+    } else if (index === 0 || array[index - 1].files.every((f) => completedFiles.has(f.path))) {
+      status = "current";
+    }
+
+    return { ...module, status };
+  });
+
+  // Trigger analysis when the file is loaded
+  useEffect(() => {
+    if (fileToAutoAnalyze && selectedFile?.path === fileToAutoAnalyze && canAnalyze) {
+      void analyzeFile();
+      setFileToAutoAnalyze(null);
+    }
+  }, [fileToAutoAnalyze, selectedFile, canAnalyze, analyzeFile]);
 
   useEffect(() => {
     if (!fileTree || learningPath || isAnalyzing) return;
@@ -148,7 +187,7 @@ export function GuidePanel() {
 
       <div className="flex-1 overflow-auto p-6">
         <div className="mx-auto max-w-2xl space-y-6">
-          {learningPath?.map((module, index) => (
+          {derivedLearningPath?.map((module, index) => (
             <div 
               key={module.id}
               className={`relative rounded-2xl border p-5 transition-all ${
@@ -160,7 +199,7 @@ export function GuidePanel() {
               }`}
             >
               {/* Connection Line */}
-              {index !== learningPath.length - 1 && (
+              {index !== derivedLearningPath.length - 1 && (
                 <div className="absolute bottom-[-24px] left-8 h-6 w-px bg-slate-200 dark:bg-slate-800" />
               )}
 
@@ -181,9 +220,23 @@ export function GuidePanel() {
                   </div>
                 </div>
                 {module.status === 'current' && (
-                  <Button size="sm" className="gap-1 rounded-full">
+                  <Button
+                    size="sm"
+                    className="gap-1 rounded-full"
+                    onClick={() => {
+                      // Find the first uncompleted file in this module
+                      const uncompletedFile = module.files.find(f => !completedFiles.has(f.path));
+                      if (uncompletedFile) {
+                        const node = findNodeByPath(fileTree, uncompletedFile.path);
+                        if (node) {
+                          setFileToAutoAnalyze(node.path);
+                          void selectFile(node, true);
+                        }
+                      }
+                    }}
+                  >
                     <PlayCircle className="size-4" />
-                    Start Module
+                    {module.files.some(f => completedFiles.has(f.path)) ? "Continue Module" : "Start Module"}
                   </Button>
                 )}
               </div>
@@ -196,7 +249,8 @@ export function GuidePanel() {
                     onClick={() => {
                       const node = findNodeByPath(fileTree, file.path);
                       if (node) {
-                        void selectFile(node);
+                        setFileToAutoAnalyze(node.path);
+                        void selectFile(node, true);
                       }
                     }}
                     className={`flex w-full items-center justify-between rounded-xl border p-3 text-left transition-colors ${
@@ -209,14 +263,16 @@ export function GuidePanel() {
                       <FileTypeIcon fileName={file.name} className="size-8 rounded-lg" iconClassName="size-4" />
                       <div>
                         <p className="text-base font-normal leading-6 text-[#1f1f1f] dark:text-[#e3e3e3]">{file.name}</p>
-                        <p className="text-sm font-normal leading-5 text-slate-400 dark:text-slate-500">{file.path}</p>
-                      </div>
-                    </div>
-                    {module.status !== 'locked' && (
-                      <ChevronRight className="size-4 text-slate-400" />
-                    )}
-                  </button>
-                ))}
+                    <p className="text-sm font-normal leading-5 text-slate-400 dark:text-slate-500">{file.path}</p>
+                  </div>
+                </div>
+                {completedFiles.has(file.path) ? (
+                  <CheckCircle2 className="size-4 text-green-500 dark:text-green-400" />
+                ) : module.status !== 'locked' ? (
+                  <ChevronRight className="size-4 text-slate-400" />
+                ) : null}
+              </button>
+            ))}
               </div>
             </div>
           ))}
