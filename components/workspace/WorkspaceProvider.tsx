@@ -20,6 +20,7 @@ import {
   type SelectFileOptions,
 } from "@/components/workspace/types";
 import {
+  findFirstFileInTree,
   isFileSystemAccessError,
   isFileSystemAccessSupported,
   pickAndBuildFileTree,
@@ -71,6 +72,7 @@ type WorkspaceContextValue = {
   folderSkippedCount: number;
   canAnalyze: boolean;
   isSupported: boolean;
+  isFileSystemReady: boolean;
   isChatOpen: boolean;
   chatContext: ChatContextData | null;
   openChat: (context?: ChatContextData) => void;
@@ -89,7 +91,7 @@ type WorkspaceContextValue = {
   dismissOnboarding: () => void;
   setPastedCode: (code: string) => void;
   setPastedLanguage: (language: string) => void;
-  openFolder: () => Promise<void>;
+  openFolder: (targetMode?: WorkspaceMode) => Promise<void>;
   selectFile: (node: FileNode, options?: SelectFileOptions) => Promise<void>;
   loadCachedAnalysis: (path: string) => boolean;
   analyzeFile: () => Promise<void>;
@@ -186,7 +188,18 @@ export function WorkspaceProvider({
     Record<string, AnalyzeResponseBody>
   >({});
   const readingPathRef = useRef<string | null>(null);
-  const isSupported = useMemo(() => isFileSystemAccessSupported(), []);
+  const shouldAutoSelectFileRef = useRef(false);
+  const [isSupported, setIsSupported] = useState(false);
+  const [isFileSystemReady, setIsFileSystemReady] = useState(false);
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      setIsSupported(isFileSystemAccessSupported());
+      setIsFileSystemReady(true);
+    }, 0);
+
+    return () => window.clearTimeout(timeout);
+  }, []);
   const pasteByteLength = useMemo(
     () => getPasteByteLength(pastedCode),
     [pastedCode]
@@ -313,15 +326,15 @@ export function WorkspaceProvider({
     resetAnalysisState(setAnalysisResult, setAnalysisError);
   }, []);
 
-  const openFolder = useCallback(async () => {
-    if (!isSupported) {
+  const openFolder = useCallback(async (targetMode?: WorkspaceMode) => {
+    if (!isFileSystemAccessSupported()) {
       setError(
         "Local folder access is not supported in this browser. Use Chrome or Edge."
       );
       return;
     }
 
-    const nextMode = mode === "guide" ? "guide" : "folder";
+    const nextMode = targetMode ?? (mode === "guide" ? "guide" : "folder");
     setMode(nextMode);
     exitFocusMode();
     resetPasteState(setPastedCode, setPastedLanguage);
@@ -335,6 +348,7 @@ export function WorkspaceProvider({
       resetFileState(setSelectedFile, setFileContent, setFileLanguage, setFileError);
       resetAnalysisState(setAnalysisResult, setAnalysisError);
       readingPathRef.current = null;
+      shouldAutoSelectFileRef.current = true;
     } catch (err) {
       if (isFileSystemAccessError(err) && err.code === "aborted") {
         return;
@@ -349,7 +363,7 @@ export function WorkspaceProvider({
     } finally {
       setIsLoading(false);
     }
-  }, [isSupported, exitFocusMode, mode]);
+  }, [exitFocusMode, mode]);
 
   const dismissError = useCallback(() => {
     setError(null);
@@ -559,6 +573,19 @@ export function WorkspaceProvider({
     [exitFocusMode, analysisCache]
   );
 
+  useEffect(() => {
+    if (!shouldAutoSelectFileRef.current || !fileTree) {
+      return;
+    }
+
+    shouldAutoSelectFileRef.current = false;
+    const firstFile = findFirstFileInTree(fileTree);
+
+    if (firstFile) {
+      void selectFile(firstFile);
+    }
+  }, [fileTree, selectFile]);
+
   const analyzeFile = useCallback(async () => {
     let code: string;
     let language: string;
@@ -617,7 +644,12 @@ export function WorkspaceProvider({
 
       if (!response.ok) {
         const serverError = "error" in data ? data.error : undefined;
-        setAnalysisError(getAnalyzeErrorMessage(response.status, serverError));
+        const message = getAnalyzeErrorMessage(response.status, serverError);
+        setAnalysisError(message);
+        showAnalysisToast({
+          title: "Analysis failed",
+          description: message,
+        });
         return;
       }
 
@@ -658,11 +690,15 @@ export function WorkspaceProvider({
 
       void refreshHistory();
     } catch {
-      setAnalysisError(
+      const message =
         mode === "paste"
           ? "Network error while analyzing the snippet."
-          : "Network error while analyzing the file."
-      );
+          : "Network error while analyzing the file.";
+      setAnalysisError(message);
+      showAnalysisToast({
+        title: "Analysis failed",
+        description: message,
+      });
     } finally {
       setIsAnalyzing(false);
     }
@@ -709,6 +745,7 @@ export function WorkspaceProvider({
       folderSkippedCount,
       canAnalyze,
       isSupported,
+      isFileSystemReady,
       isChatOpen,
       chatContext,
       openChat,
@@ -766,6 +803,7 @@ export function WorkspaceProvider({
       folderSkippedCount,
       canAnalyze,
       isSupported,
+      isFileSystemReady,
       isChatOpen,
       chatContext,
       openChat,

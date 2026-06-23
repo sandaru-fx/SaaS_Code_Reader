@@ -21,6 +21,7 @@ export {
   shouldSkipEntry,
   shouldSkipFile,
 } from "@/lib/file-system/skip-rules";
+export { findFirstFileInTree } from "@/lib/file-system/find-first-file";
 export { countFileNodes, serializeTreeForAI, findNodeByPath } from "@/lib/file-system/tree-utils";
 export {
   FileSystemAccessError,

@@ -33,6 +33,9 @@ export function GuidePanel({ compact = false }: GuidePanelProps) {
     isAnalyzing: isAnalyzingFile,
     showToast,
     exitGuideLesson,
+    openFolder,
+    isSupported,
+    isFileSystemReady,
   } = useWorkspace();
   const [isAnalyzingProject, setIsAnalyzingProject] = useState(false);
   const [learningPath, setLearningPath] = useState<LearningModule[] | null>(null);
@@ -179,6 +182,8 @@ export function GuidePanel({ compact = false }: GuidePanelProps) {
     selectedFile?.path === path && (isReadingFile || isAnalyzingFile);
 
   if (!fileTree) {
+    const canOpenFolder = !isFileSystemReady || isSupported;
+
     return (
       <div className="flex flex-1 flex-col items-center justify-center p-8 text-center dark:bg-[#121212]">
         <div className="mb-4 flex size-16 items-center justify-center rounded-2xl bg-slate-100 dark:bg-[#14d1a0]/10 dark:border dark:border-[#14d1a0]/20">
@@ -191,6 +196,19 @@ export function GuidePanel({ compact = false }: GuidePanelProps) {
           Open a folder to let the AI analyze your project and create a personalized
           learning path.
         </p>
+        <Button
+          type="button"
+          className="mt-6 rounded-full px-6 premium-btn-primary"
+          disabled={!canOpenFolder}
+          onClick={() => void openFolder("guide")}
+        >
+          Open Folder
+        </Button>
+        {isFileSystemReady && !isSupported ? (
+          <p className="mt-3 max-w-sm text-sm text-amber-700 dark:text-[#cc7a31]">
+            Use Chrome or Edge to open local project folders.
+          </p>
+        ) : null}
       </div>
     );
   }

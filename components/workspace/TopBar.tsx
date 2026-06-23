@@ -32,8 +32,13 @@ export function TopBar({ onToggleTheme, isDark }: TopBarProps) {
     mode,
     isLoading,
     isAnalyzing,
+    isReadingFile,
     isSupported,
+    isFileSystemReady,
     canAnalyze,
+    selectedFile,
+    fileContent,
+    pastedCode,
     analysisResult,
     activeAnalyzeLabel,
     isFocusMode,
@@ -44,15 +49,46 @@ export function TopBar({ onToggleTheme, isDark }: TopBarProps) {
     switchToGuide,
     openFolder,
     analyzeFile,
+    showToast,
     isChatOpen,
     toggleChat,
   } = useWorkspace();
 
   const analyzeLabel = isAnalyzing
     ? "Analyzing..."
-    : analysisResult
-      ? "Re-analyze"
-      : "Analyze";
+    : isReadingFile
+      ? "Loading file..."
+      : !canAnalyze && mode === "paste"
+        ? "Paste code first"
+        : !canAnalyze && mode !== "paste" && !selectedFile
+          ? "Select a file"
+          : analysisResult
+            ? "Re-analyze"
+            : "Analyze";
+
+  const canOpenFolder = !isFileSystemReady || isSupported;
+
+  const handleAnalyzeClick = () => {
+    if (isAnalyzing) {
+      return;
+    }
+
+    if (!canAnalyze) {
+      const description = isReadingFile || (selectedFile && fileContent === null)
+        ? "Wait for the file to finish loading."
+        : mode === "paste"
+          ? "Paste a code snippet in the editor first."
+          : "Click a file in the left sidebar, then analyze it.";
+
+      showToast({
+        title: "Cannot analyze yet",
+        description,
+      });
+      return;
+    }
+
+    void analyzeFile();
+  };
 
   return (
     <header className="flex h-16 shrink-0 items-center gap-4 border-b border-slate-200/80 bg-white/95 px-6 backdrop-blur dark:border-white/[0.06] dark:bg-[#121212]/95">
@@ -182,8 +218,8 @@ export function TopBar({ onToggleTheme, isDark }: TopBarProps) {
             variant="outline"
             size="sm"
             className="h-9 rounded-full border-slate-200 bg-white px-4 shadow-sm dark:border-white/[0.06] dark:bg-white/[0.03] dark:text-[#e3e3e3]"
-            disabled={!isSupported || isLoading}
-            onClick={openFolder}
+            disabled={!canOpenFolder || isLoading}
+            onClick={() => void openFolder()}
             suppressHydrationWarning
           >
             {isLoading ? <Loader2 className="animate-spin" /> : <FolderOpen strokeWidth={1.5} />}
@@ -195,8 +231,8 @@ export function TopBar({ onToggleTheme, isDark }: TopBarProps) {
             variant="outline"
             size="sm"
             className="h-9 rounded-full border-slate-200 bg-white px-4 shadow-sm dark:border-white/[0.06] dark:bg-white/[0.03] dark:text-[#e3e3e3]"
-            disabled={!isSupported || isLoading}
-            onClick={openFolder}
+            disabled={!canOpenFolder || isLoading}
+            onClick={() => void openFolder()}
             suppressHydrationWarning
           >
             {isLoading ? <Loader2 className="animate-spin" /> : <FolderOpen strokeWidth={1.5} />}
@@ -206,8 +242,13 @@ export function TopBar({ onToggleTheme, isDark }: TopBarProps) {
         <Button
           size="sm"
           className="h-9 rounded-full px-4 shadow-sm premium-btn-primary"
-          disabled={!canAnalyze}
-          onClick={analyzeFile}
+          disabled={isAnalyzing || isReadingFile}
+          onClick={handleAnalyzeClick}
+          title={
+            canAnalyze
+              ? "Analyze the selected file"
+              : "Select a file from the sidebar first"
+          }
         >
           {isAnalyzing ? <Loader2 className="animate-spin" /> : <Sparkles strokeWidth={1.75} />}
           {analyzeLabel}

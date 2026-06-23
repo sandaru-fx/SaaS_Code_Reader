@@ -53,6 +53,8 @@ export function Sidebar() {
     isLoading,
     error,
     isSupported,
+    isFileSystemReady,
+    openFolder,
     switchToFolder,
     selectFile,
     dismissError,
@@ -132,6 +134,8 @@ export function Sidebar() {
     );
   }
 
+  const canOpenFolder = !isFileSystemReady || isSupported;
+
   const headerLabel = fileTree ? fileTree.name : "File Explorer";
 
   return (
@@ -155,7 +159,9 @@ export function Sidebar() {
       </div>
 
       <ScrollArea className="min-h-0 flex-1">
-        {!isSupported ? (
+        {!isFileSystemReady ? (
+          <FileTreeSkeleton />
+        ) : !isSupported ? (
           <EmptyState
             icon={AlertCircle}
             title="Browser not supported"
@@ -187,12 +193,23 @@ export function Sidebar() {
             />
           </div>
         ) : (
-          <EmptyState
-            icon={FolderTree}
-            title="No folder opened yet"
-            description='Use "Open Folder" to load a local project'
-            className="min-h-[280px]"
-          />
+          <div className="flex min-h-[280px] flex-col items-center justify-center gap-4 p-6">
+            <EmptyState
+              icon={FolderTree}
+              title="No folder opened yet"
+              description='Open a local project folder to browse files here.'
+              className="min-h-0 border-0 bg-transparent p-0 shadow-none"
+            />
+            <Button
+              type="button"
+              size="sm"
+              className="rounded-full premium-btn-primary"
+              disabled={!canOpenFolder || isLoading}
+              onClick={() => void openFolder()}
+            >
+              Open Folder
+            </Button>
+          </div>
         )}
       </ScrollArea>
     </aside>
