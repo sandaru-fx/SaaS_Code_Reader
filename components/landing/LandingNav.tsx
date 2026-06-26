@@ -18,10 +18,25 @@ const NAV_LINKS = [
   { href: "#faq", label: "FAQ" },
 ] as const;
 
-function NavLinks({ onSelect }: { onSelect?: () => void }) {
+const STANDALONE_NAV_LINKS = [
+  { href: "/#features", label: "Features" },
+  { href: "/#how-it-works", label: "How it works" },
+  { href: "/pricing", label: "Pricing" },
+  { href: "/#faq", label: "FAQ" },
+] as const;
+
+function NavLinks({
+  onSelect,
+  standalone = false,
+}: {
+  onSelect?: () => void;
+  standalone?: boolean;
+}) {
+  const links = standalone ? STANDALONE_NAV_LINKS : NAV_LINKS;
+
   return (
     <>
-      {NAV_LINKS.map((link) => (
+      {links.map((link) => (
         <a
           key={link.href}
           href={link.href}
@@ -91,9 +106,10 @@ function AuthActionsWithClerk() {
   );
 }
 
-export function LandingNav() {
+export function LandingNav({ standalone = false }: { standalone?: boolean }) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const links = standalone ? STANDALONE_NAV_LINKS : NAV_LINKS;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -123,7 +139,7 @@ export function LandingNav() {
         <div className="flex items-center gap-10">
           <Logo />
           <nav className="hidden items-center gap-7 lg:flex">
-            <NavLinks />
+            <NavLinks standalone={standalone} />
           </nav>
         </div>
 
@@ -160,7 +176,7 @@ export function LandingNav() {
         <div className="border-t border-white/[0.06] bg-[#07090b]/95 backdrop-blur-xl sm:hidden">
           <div className="mx-auto flex w-full max-w-6xl flex-col gap-2 px-6 py-5">
             <nav className="flex flex-col gap-1">
-              {NAV_LINKS.map((link) => (
+              {links.map((link) => (
                 <a
                   key={link.href}
                   href={link.href}

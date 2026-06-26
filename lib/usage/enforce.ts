@@ -22,25 +22,30 @@ export async function enforceUsageLimit(
     return null;
   }
 
-  const result = await checkUsageLimit(userId, eventType);
+  try {
+    const result = await checkUsageLimit(userId, eventType);
 
-  if (result.allowed) {
+    if (result.allowed) {
+      return null;
+    }
+
+    return NextResponse.json(
+      {
+        error: result.message,
+        code: "usage-limit-exceeded",
+        eventType: result.eventType,
+        upgradeUrl: "/pricing",
+      },
+      {
+        status: 429,
+        headers: {
+          "X-Usage-Event": result.eventType,
+          "X-Usage-Limit": USAGE_EVENT_LABELS[result.eventType],
+        },
+      }
+    );
+  } catch {
+    // Billing tables missing or Supabase unavailable — do not block core features.
     return null;
   }
-
-  return NextResponse.json(
-    {
-      error: result.message,
-      code: "usage-limit-exceeded",
-      eventType: result.eventType,
-      upgradeUrl: "/pricing",
-    },
-    {
-      status: 429,
-      headers: {
-        "X-Usage-Event": result.eventType,
-        "X-Usage-Limit": USAGE_EVENT_LABELS[result.eventType],
-      },
-    }
-  );
 }

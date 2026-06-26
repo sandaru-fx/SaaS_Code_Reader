@@ -5,6 +5,7 @@ import {
 } from "@/lib/usage/constants";
 import { isUsageLimitsEnabled } from "@/lib/usage/is-enabled";
 import type { UsageLimitResult, UsageStatus, UserPlan } from "@/lib/usage/types";
+import { isMissingSchemaError } from "@/lib/usage/supabase-errors";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 type UsagePeriod = {
@@ -29,6 +30,10 @@ async function getUserPlan(userId: string): Promise<UserPlan> {
     .maybeSingle();
 
   if (error) {
+    if (isMissingSchemaError(error)) {
+      return "free";
+    }
+
     throw error;
   }
 
@@ -50,6 +55,10 @@ async function countUsage(
     .lt("created_at", period.end.toISOString());
 
   if (error) {
+    if (isMissingSchemaError(error)) {
+      return 0;
+    }
+
     throw error;
   }
 
@@ -102,6 +111,10 @@ export async function recordUsage(
   });
 
   if (error) {
+    if (isMissingSchemaError(error)) {
+      return;
+    }
+
     throw error;
   }
 }
