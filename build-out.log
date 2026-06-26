@@ -1,0 +1,277 @@
+
+> coderider@0.1.0 build
+> next build
+
+Γû▓ Next.js 16.2.9 (Turbopack)
+- Environments: .env.local
+
+  Creating an optimized production build ...
+
+> Build error occurred
+Error: Turbopack build failed with 10 errors:
+./components/landing/LandingFooter.tsx:3:1
+Export Github doesn't exist in target module
+  1 | import { c as _c } from "react/compiler-runtime";
+  2 | import Link from "next/link";
+> 3 | import { Github, Twitter } from "lucide-react";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  4 | import { Logo } from "@/components/landing/Logo";
+  5 | import { GITHUB_URL, SITE_NAME } from "@/lib/site";
+  6 | const LINK_COLUMNS = [{
+
+The export Github was not found in module [project]/node_modules/lucide-react/dist/esm/lucide-react.mjs [app-client] (ecmascript).
+Did you mean to import Gift?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Server Component:
+    ./components/landing/LandingFooter.tsx
+    ./app/privacy/page.tsx
+
+  Client Component Browser:
+    ./components/landing/LandingFooter.tsx [Client Component Browser]
+    ./app/pricing/page.tsx [Client Component Browser]
+    ./app/pricing/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/landing/LandingFooter.tsx [Client Component SSR]
+    ./app/pricing/page.tsx [Client Component SSR]
+    ./app/pricing/page.tsx [Server Component]
+
+
+./components/landing/LandingFooter.tsx:2:1
+Export Github doesn't exist in target module
+  1 | import Link from "next/link";
+> 2 | import { Github, Twitter } from "lucide-react";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  3 |
+  4 | import { Logo } from "@/components/landing/Logo";
+  5 | import { GITHUB_URL, SITE_NAME } from "@/lib/site";
+
+The export Github was not found in module [project]/node_modules/lucide-react/dist/esm/lucide-react.mjs [app-rsc] (ecmascript).
+Did you mean to import Gift?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Server Component:
+    ./components/landing/LandingFooter.tsx
+    ./app/privacy/page.tsx
+
+  Client Component Browser:
+    ./components/landing/LandingFooter.tsx [Client Component Browser]
+    ./app/pricing/page.tsx [Client Component Browser]
+    ./app/pricing/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/landing/LandingFooter.tsx [Client Component SSR]
+    ./app/pricing/page.tsx [Client Component SSR]
+    ./app/pricing/page.tsx [Server Component]
+
+
+./components/landing/LandingFooter.tsx:2:1
+Export Github doesn't exist in target module
+  1 | import Link from "next/link";
+> 2 | import { Github, Twitter } from "lucide-react";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  3 |
+  4 | import { Logo } from "@/components/landing/Logo";
+  5 | import { GITHUB_URL, SITE_NAME } from "@/lib/site";
+
+The export Github was not found in module [project]/node_modules/lucide-react/dist/esm/lucide-react.mjs [app-ssr] (ecmascript).
+Did you mean to import Gift?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Server Component:
+    ./components/landing/LandingFooter.tsx
+    ./app/privacy/page.tsx
+
+  Client Component Browser:
+    ./components/landing/LandingFooter.tsx [Client Component Browser]
+    ./app/pricing/page.tsx [Client Component Browser]
+    ./app/pricing/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/landing/LandingFooter.tsx [Client Component SSR]
+    ./app/pricing/page.tsx [Client Component SSR]
+    ./app/pricing/page.tsx [Server Component]
+
+
+./components/landing/LandingNav.tsx:7:1
+Export Github doesn't exist in target module
+   5 | import { useEffect, useState } from "react";
+   6 | import { useAuth, UserButton } from "@clerk/nextjs";
+>  7 | import { Github, Menu, X } from "lucide-react";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   8 | import { Logo } from "@/components/landing/Logo";
+   9 | import { isClerkPublishableKeySet } from "@/lib/clerk/is-configured";
+  10 | import { GITHUB_URL } from "@/lib/site";
+
+The export Github was not found in module [project]/node_modules/lucide-react/dist/esm/lucide-react.mjs [app-client] (ecmascript).
+Did you mean to import Gift?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import trace:
+  Server Component:
+    ./components/landing/LandingNav.tsx
+    ./app/page.tsx
+
+
+./components/landing/LandingNav.tsx:6:1
+Export Github doesn't exist in target module
+  4 | import { useEffect, useState } from "react";
+  5 | import { useAuth, UserButton } from "@clerk/nextjs";
+> 6 | import { Github, Menu, X } from "lucide-react";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 |
+  8 | import { Logo } from "@/components/landing/Logo";
+  9 | import { isClerkPublishableKeySet } from "@/lib/clerk/is-configured";
+
+The export Github was not found in module [project]/node_modules/lucide-react/dist/esm/lucide-react.mjs [app-ssr] (ecmascript).
+Did you mean to import Gift?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import trace:
+  Server Component:
+    ./components/landing/LandingNav.tsx
+    ./app/page.tsx
+
+
+./components/landing/SocialProof.tsx:5:1
+Export Github doesn't exist in target module
+  3 | import { c as _c } from "react/compiler-runtime";
+  4 | import { useEffect, useState } from "react";
+> 5 | import { Github, Quote, Star } from "lucide-react";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  6 | import { useReveal } from "@/components/landing/useReveal";
+  7 | import { GITHUB_URL } from "@/lib/site";
+  8 | type Testimonial = {
+
+The export Github was not found in module [project]/node_modules/lucide-react/dist/esm/lucide-react.mjs [app-client] (ecmascript).
+Did you mean to import Gift?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import trace:
+  Server Component:
+    ./components/landing/SocialProof.tsx
+    ./app/page.tsx
+
+
+./components/landing/SocialProof.tsx:4:1
+Export Github doesn't exist in target module
+  2 |
+  3 | import { useEffect, useState } from "react";
+> 4 | import { Github, Quote, Star } from "lucide-react";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | import { useReveal } from "@/components/landing/useReveal";
+  7 | import { GITHUB_URL } from "@/lib/site";
+
+The export Github was not found in module [project]/node_modules/lucide-react/dist/esm/lucide-react.mjs [app-ssr] (ecmascript).
+Did you mean to import Gift?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import trace:
+  Server Component:
+    ./components/landing/SocialProof.tsx
+    ./app/page.tsx
+
+
+./components/landing/LandingFooter.tsx:3:1
+Export Twitter doesn't exist in target module
+  1 | import { c as _c } from "react/compiler-runtime";
+  2 | import Link from "next/link";
+> 3 | import { Github, Twitter } from "lucide-react";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  4 | import { Logo } from "@/components/landing/Logo";
+  5 | import { GITHUB_URL, SITE_NAME } from "@/lib/site";
+  6 | const LINK_COLUMNS = [{
+
+The export Twitter was not found in module [project]/node_modules/lucide-react/dist/esm/lucide-react.mjs [app-client] (ecmascript).
+Did you mean to import Timer?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Server Component:
+    ./components/landing/LandingFooter.tsx
+    ./app/privacy/page.tsx
+
+  Client Component Browser:
+    ./components/landing/LandingFooter.tsx [Client Component Browser]
+    ./app/pricing/page.tsx [Client Component Browser]
+    ./app/pricing/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/landing/LandingFooter.tsx [Client Component SSR]
+    ./app/pricing/page.tsx [Client Component SSR]
+    ./app/pricing/page.tsx [Server Component]
+
+
+./components/landing/LandingFooter.tsx:2:1
+Export Twitter doesn't exist in target module
+  1 | import Link from "next/link";
+> 2 | import { Github, Twitter } from "lucide-react";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  3 |
+  4 | import { Logo } from "@/components/landing/Logo";
+  5 | import { GITHUB_URL, SITE_NAME } from "@/lib/site";
+
+The export Twitter was not found in module [project]/node_modules/lucide-react/dist/esm/lucide-react.mjs [app-rsc] (ecmascript).
+Did you mean to import Timer?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Server Component:
+    ./components/landing/LandingFooter.tsx
+    ./app/privacy/page.tsx
+
+  Client Component Browser:
+    ./components/landing/LandingFooter.tsx [Client Component Browser]
+    ./app/pricing/page.tsx [Client Component Browser]
+    ./app/pricing/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/landing/LandingFooter.tsx [Client Component SSR]
+    ./app/pricing/page.tsx [Client Component SSR]
+    ./app/pricing/page.tsx [Server Component]
+
+
+./components/landing/LandingFooter.tsx:2:1
+Export Twitter doesn't exist in target module
+  1 | import Link from "next/link";
+> 2 | import { Github, Twitter } from "lucide-react";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  3 |
+  4 | import { Logo } from "@/components/landing/Logo";
+  5 | import { GITHUB_URL, SITE_NAME } from "@/lib/site";
+
+The export Twitter was not found in module [project]/node_modules/lucide-react/dist/esm/lucide-react.mjs [app-ssr] (ecmascript).
+Did you mean to import Timer?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Server Component:
+    ./components/landing/LandingFooter.tsx
+    ./app/privacy/page.tsx
+
+  Client Component Browser:
+    ./components/landing/LandingFooter.tsx [Client Component Browser]
+    ./app/pricing/page.tsx [Client Component Browser]
+    ./app/pricing/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/landing/LandingFooter.tsx [Client Component SSR]
+    ./app/pricing/page.tsx [Client Component SSR]
+    ./app/pricing/page.tsx [Server Component]
+
+
+    at <unknown> (./components/landing/LandingFooter.tsx:3:1)
+    at <unknown> (./components/landing/LandingFooter.tsx:2:1)
+    at <unknown> (./components/landing/LandingFooter.tsx:2:1)
+    at <unknown> (./components/landing/LandingNav.tsx:7:1)
+    at <unknown> (./components/landing/LandingNav.tsx:6:1)
+    at <unknown> (./components/landing/SocialProof.tsx:5:1)
+    at <unknown> (./components/landing/SocialProof.tsx:4:1)
+    at <unknown> (./components/landing/LandingFooter.tsx:3:1)
+    at <unknown> (./components/landing/LandingFooter.tsx:2:1)
+    at <unknown> (./components/landing/LandingFooter.tsx:2:1)
