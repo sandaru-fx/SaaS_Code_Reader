@@ -4,11 +4,13 @@ import { useSearchParams } from "next/navigation";
 
 import { TopBar } from "@/components/workspace/TopBar";
 import { WorkspacePanels } from "@/components/workspace/WorkspacePanels";
+import { ProductTour } from "@/components/workspace/ProductTour";
 import type { WorkspaceMode } from "@/components/workspace/types";
 import { WorkspaceErrorBoundary } from "@/components/workspace/WorkspaceErrorBoundary";
 import { AnalysisToast } from "@/components/workspace/AnalysisToast";
 import { WorkspaceProvider } from "@/components/workspace/WorkspaceProvider";
 import { WorkspaceShortcuts } from "@/components/workspace/WorkspaceShortcuts";
+import { useWorkspace } from "@/components/workspace/WorkspaceProvider";
 import { useWorkspaceTheme } from "@/components/workspace/useWorkspaceTheme";
 import { cn } from "@/lib/utils";
 
@@ -18,6 +20,7 @@ function getInitialMode(modeParam: string | null): WorkspaceMode {
 
 function WorkspaceShell() {
   const { isDark, toggleTheme } = useWorkspaceTheme();
+  const { isTourActive, tourSteps, completeTour, skipTour } = useWorkspace();
 
   return (
     <div
@@ -33,6 +36,12 @@ function WorkspaceShell() {
       </div>
       <AnalysisToast />
       <WorkspaceShortcuts />
+      <ProductTour
+        steps={tourSteps}
+        isActive={isTourActive}
+        onComplete={completeTour}
+        onSkip={skipTour}
+      />
     </div>
   );
 }

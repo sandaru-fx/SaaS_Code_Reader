@@ -1,12 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { UserButton } from "@clerk/nextjs";
 import {
   ClipboardPaste,
   FileCode2,
   FolderOpen,
   GitBranch,
+  HelpCircle,
   Loader2,
   Maximize2,
   MessageSquare,
@@ -18,6 +20,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { HelpPanel } from "@/components/workspace/HelpPanel";
 import { UsageBadge } from "@/components/workspace/UsageBadge";
 import { useWorkspace } from "@/components/workspace/WorkspaceProvider";
 import { isClerkPublishableKeySet } from "@/lib/clerk/is-configured";
@@ -52,7 +55,10 @@ export function TopBar({ onToggleTheme, isDark }: TopBarProps) {
     showToast,
     isChatOpen,
     toggleChat,
+    startTour,
   } = useWorkspace();
+
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   const analyzeLabel = isAnalyzing
     ? "Analyzing..."
@@ -165,6 +171,17 @@ export function TopBar({ onToggleTheme, isDark }: TopBarProps) {
 
       <div className="ml-auto flex items-center gap-2">
         <UsageBadge />
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="h-9 w-9 rounded-full border-slate-200 bg-white p-0 shadow-sm dark:border-white/[0.06] dark:bg-white/[0.03] dark:text-[#e3e3e3]"
+          onClick={() => setIsHelpOpen(true)}
+          aria-label="Open help"
+          title="Help"
+        >
+          <HelpCircle className="size-4" strokeWidth={1.5} />
+        </Button>
         <span className="hidden text-[11px] text-slate-400 lg:inline dark:text-[#e3e3e3]/40">
           Ctrl+Enter to analyze
         </span>
@@ -244,6 +261,7 @@ export function TopBar({ onToggleTheme, isDark }: TopBarProps) {
           className="h-9 rounded-full px-4 shadow-sm premium-btn-primary"
           disabled={isAnalyzing || isReadingFile}
           onClick={handleAnalyzeClick}
+          data-tour-id="analyze-button"
           title={
             canAnalyze
               ? "Analyze the selected file"
@@ -255,6 +273,12 @@ export function TopBar({ onToggleTheme, isDark }: TopBarProps) {
         </Button>
         {isClerkPublishableKeySet() ? <UserButton /> : null}
       </div>
+
+      <HelpPanel
+        isOpen={isHelpOpen}
+        onClose={() => setIsHelpOpen(false)}
+        onStartTour={startTour}
+      />
     </header>
   );
 }

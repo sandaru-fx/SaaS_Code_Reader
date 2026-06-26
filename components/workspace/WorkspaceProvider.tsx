@@ -34,7 +34,15 @@ import {
   SESSION_ID_HEADER,
 } from "@/lib/session/client-id";
 import type { AnalysisHistoryItem } from "@/lib/supabase/types";
-import { isOnboardingDismissed } from "@/lib/workspace/onboarding";
+import {
+  dismissOnboarding,
+  dismissPasteHint,
+  isOnboardingDismissed,
+  isPasteHintDismissed,
+  isTourCompleted,
+  markTourCompleted,
+} from "@/lib/workspace/onboarding";
+import { getTourStepsForMode } from "@/lib/workspace/tour-steps";
 
 type SidebarTab = "explorer" | "history";
 type AiPanelTab = "diagram" | "explanation";
@@ -52,6 +60,9 @@ type WorkspaceContextValue = {
   analysisToast: AnalysisToastState | null;
   isFocusMode: boolean;
   showOnboarding: boolean;
+  showPasteHint: boolean;
+  isTourActive: boolean;
+  tourSteps: ReturnType<typeof getTourStepsForMode>;
   fileTree: FileNode | null;
   selectedFile: FileNode | null;
   fileContent: string | null;
@@ -89,6 +100,10 @@ type WorkspaceContextValue = {
   enterFocusMode: () => void;
   exitFocusMode: () => void;
   dismissOnboarding: () => void;
+  dismissPasteHintPanel: () => void;
+  startTour: () => void;
+  completeTour: () => void;
+  skipTour: () => void;
   setPastedCode: (code: string) => void;
   setPastedLanguage: (language: string) => void;
   openFolder: (targetMode?: WorkspaceMode) => Promise<void>;
@@ -160,6 +175,10 @@ export function WorkspaceProvider({
   const [showOnboarding, setShowOnboarding] = useState(
     () => !isOnboardingDismissed()
   );
+  const [showPasteHint, setShowPasteHint] = useState(
+    () => !isPasteHintDismissed()
+  );
+  const [isTourActive, setIsTourActive] = useState(false);
   const [fileTree, setFileTree] = useState<FileNode | null>(null);
   const [selectedFile, setSelectedFile] = useState<FileNode | null>(null);
   const [fileContent, setFileContent] = useState<string | null>(null);
@@ -228,8 +247,30 @@ export function WorkspaceProvider({
   }, []);
 
   const dismissOnboardingPanel = useCallback(() => {
+    dismissOnboarding();
     setShowOnboarding(false);
   }, []);
+
+  const dismissPasteHintPanel = useCallback(() => {
+    dismissPasteHint();
+    setShowPasteHint(false);
+  }, []);
+
+  const completeTour = useCallback(() => {
+    markTourCompleted();
+    setIsTourActive(false);
+  }, []);
+
+  const skipTour = useCallback(() => {
+    markTourCompleted();
+    setIsTourActive(false);
+  }, []);
+
+  const startTour = useCallback(() => {
+    setIsTourActive(true);
+  }, []);
+
+  const tourSteps = useMemo(() => getTourStepsForMode(mode), [mode]);
 
   const openChat = useCallback((context?: ChatContextData) => {
     if (context) {
@@ -586,6 +627,18 @@ export function WorkspaceProvider({
     }
   }, [fileTree, selectFile]);
 
+  useEffect(() => {
+    if (!fileTree || mode === "paste" || mode === "guide" || isTourCompleted()) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      setIsTourActive(true);
+    }, 600);
+
+    return () => window.clearTimeout(timer);
+  }, [fileTree, mode]);
+
   const analyzeFile = useCallback(async () => {
     let code: string;
     let language: string;
@@ -725,6 +778,9 @@ export function WorkspaceProvider({
       analysisToast,
       isFocusMode,
       showOnboarding,
+      showPasteHint,
+      isTourActive,
+      tourSteps,
       fileTree,
       selectedFile,
       fileContent,
@@ -762,6 +818,10 @@ export function WorkspaceProvider({
       enterFocusMode,
       exitFocusMode,
       dismissOnboarding: dismissOnboardingPanel,
+      dismissPasteHintPanel,
+      startTour,
+      completeTour,
+      skipTour,
       setPastedCode: updatePastedCode,
       setPastedLanguage: updatePastedLanguage,
       openFolder,
@@ -783,6 +843,9 @@ export function WorkspaceProvider({
       analysisToast,
       isFocusMode,
       showOnboarding,
+      showPasteHint,
+      isTourActive,
+      tourSteps,
       fileTree,
       selectedFile,
       fileContent,
@@ -820,6 +883,11 @@ export function WorkspaceProvider({
       enterFocusMode,
       exitFocusMode,
       dismissOnboardingPanel,
+      dismissPasteHintPanel,
+      startTour,
+      completeTour,
+      skipTour,
+      tourSteps,
       updatePastedCode,
       updatePastedLanguage,
       openFolder,

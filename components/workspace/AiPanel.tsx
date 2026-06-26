@@ -92,7 +92,10 @@ export function AiPanel() {
         className="flex h-full min-h-0 flex-col gap-0"
       >
         <div className="flex h-14 shrink-0 items-center bg-white px-5 dark:bg-[#121212]">
-          <TabsList className="h-9 w-full rounded-full bg-slate-100 p-1 dark:bg-white/[0.03] dark:border dark:border-white/[0.06]">
+          <TabsList
+            className="h-9 w-full rounded-full bg-slate-100 p-1 dark:bg-white/[0.03] dark:border dark:border-white/[0.06]"
+            data-tour-id="ai-panel-tabs"
+          >
             <TabsTrigger value="diagram" className="flex-1 data-[state=active]:premium-btn-primary dark:text-[#e3e3e3]/70 dark:data-[state=active]:text-[#0d1f1a]">
               <GitBranch className="size-3.5" strokeWidth={1.5} />
               Diagram

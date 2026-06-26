@@ -10,7 +10,6 @@ import { FileTypeIcon } from "@/components/workspace/FileTypeIcon";
 import { CodeBlockSkeleton } from "@/components/workspace/LoadingSkeletons";
 import { PastePanel } from "@/components/workspace/PastePanel";
 import { getPasteSnippetFileName } from "@/components/workspace/paste-utils";
-import { WorkspaceOnboarding } from "@/components/workspace/WorkspaceOnboarding";
 import { useWorkspace } from "@/components/workspace/WorkspaceProvider";
 
 export function CodeViewer() {
@@ -25,10 +24,10 @@ export function CodeViewer() {
     isReadingFile,
     fileError,
     dismissFileError,
-    showOnboarding,
-    dismissOnboarding,
     exitGuideLesson,
     isAnalyzing,
+    openFolder,
+    switchToGuide,
   } = useWorkspace();
 
   if (mode === "paste") {
@@ -71,7 +70,10 @@ export function CodeViewer() {
       : 0;
 
   return (
-    <main className="flex min-w-0 flex-1 flex-col bg-slate-50 dark:bg-[#0f0f0f]">
+    <main
+      className="flex min-w-0 flex-1 flex-col bg-slate-50 dark:bg-[#0f0f0f]"
+      data-tour-id="code-editor"
+    >
       <div className="flex h-14 shrink-0 items-center gap-3 border-b border-slate-200 bg-white px-5 dark:border-white/[0.06] dark:bg-[#121212]">
         {mode === "guide" && selectedFile ? (
           <Button
@@ -119,15 +121,30 @@ export function CodeViewer() {
       </div>
 
       <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-white/70 dark:bg-[#121212]">
-        {showOnboarding && !selectedFile && !fileTree ? (
-          <WorkspaceOnboarding onDismiss={dismissOnboarding} />
-        ) : !selectedFile ? (
+        {!selectedFile ? (
           <div className="flex flex-1 items-center justify-center">
             <EmptyState
               icon={FileCode2}
               title="Select a file from the sidebar"
-              description="File contents will appear here with syntax highlighting"
+              description="File contents will appear here with syntax highlighting. Or open a folder to get started."
               iconClassName="size-10"
+              action={
+                !fileTree
+                  ? {
+                      label: "Open Folder",
+                      onClick: () => void openFolder(),
+                    }
+                  : undefined
+              }
+              secondaryAction={
+                !fileTree
+                  ? {
+                      label: "Try Guide Me",
+                      onClick: switchToGuide,
+                      variant: "outline",
+                    }
+                  : undefined
+              }
             />
           </div>
         ) : isReadingFile ? (

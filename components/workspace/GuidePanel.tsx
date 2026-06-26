@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { ProjectOverview } from "@/components/workspace/ProjectOverview";
 import { useWorkspace } from "@/components/workspace/WorkspaceProvider";
 import { serializeTreeForAI, findNodeByPath, readFileNode } from "@/lib/file-system";
+import { isTourCompleted } from "@/lib/workspace/onboarding";
 import type { LearningModule, ProjectOverview as ProjectOverviewData } from "@/lib/ai/project-types";
 
 type GuidePanelProps = {
@@ -36,6 +37,8 @@ export function GuidePanel({ compact = false }: GuidePanelProps) {
     openFolder,
     isSupported,
     isFileSystemReady,
+    startTour,
+    isTourActive,
   } = useWorkspace();
   const [isAnalyzingProject, setIsAnalyzingProject] = useState(false);
   const [learningPath, setLearningPath] = useState<LearningModule[] | null>(null);
@@ -88,6 +91,18 @@ export function GuidePanel({ compact = false }: GuidePanelProps) {
       moduleStatusRef.current[module.id] = module.status;
     }
   }, [derivedLearningPath, showToast]);
+
+  useEffect(() => {
+    if (!learningPath || isTourCompleted() || isTourActive) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      startTour();
+    }, 800);
+
+    return () => window.clearTimeout(timer);
+  }, [learningPath, startTour, isTourActive]);
 
   useEffect(() => {
     if (!fileToAutoAnalyze || selectedFile?.path !== fileToAutoAnalyze) {
@@ -238,7 +253,7 @@ export function GuidePanel({ compact = false }: GuidePanelProps) {
   };
 
   const learningPathSection = (
-    <section>
+    <section data-tour-id="guide-learning-path">
       {!compact ? (
         <>
           <div className="mb-4 flex items-center gap-2 text-blue-600 premium-accent">
@@ -347,6 +362,7 @@ export function GuidePanel({ compact = false }: GuidePanelProps) {
                 <Button
                   size="sm"
                   className="shrink-0 gap-1 rounded-full premium-btn-primary"
+                  data-tour-id="guide-start-module"
                   onClick={() => {
                     const uncompletedFile = module.files.find(
                       (f) => !completedFiles.has(f.path)

@@ -22,7 +22,7 @@ export function WorkspacePanels() {
     resizeChatPanel,
   } = usePanelLayout();
 
-  if (mode === "folder" && !fileTree) {
+  if (!fileTree && mode !== "paste") {
     return <ModeSelection />;
   }
 

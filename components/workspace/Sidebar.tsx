@@ -23,6 +23,7 @@ function SidebarTabs() {
           sidebarTab === "explorer" ? "premium-btn-primary" : "dark:text-[#e3e3e3]/65"
         }`}
         onClick={() => setSidebarTab("explorer")}
+        data-tour-id="sidebar-explorer"
       >
         <FolderTree className="size-3.5" strokeWidth={1.5} />
         Explorer
@@ -35,6 +36,7 @@ function SidebarTabs() {
           sidebarTab === "history" ? "premium-btn-primary" : "dark:text-[#e3e3e3]/65"
         }`}
         onClick={() => setSidebarTab("history")}
+        data-tour-id="sidebar-history"
       >
         <Clock3 className="size-3.5" strokeWidth={1.5} />
         History
