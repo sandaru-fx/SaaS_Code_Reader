@@ -59,3 +59,15 @@ export const CODERIDER_MERMAID_DARK_CONFIG: MermaidConfig = {
 export function getMermaidConfig(isDark: boolean): MermaidConfig {
   return isDark ? CODERIDER_MERMAID_DARK_CONFIG : CODERIDER_MERMAID_CONFIG;
 }
+
+/** Re-apply after render so SVG nodes pick up classDef fills. */
+export const MERMAID_RENDER_OVERRIDES: Partial<MermaidConfig> = {
+  flowchart: {
+    htmlLabels: true,
+    curve: "basis",
+    padding: 20,
+    nodeSpacing: 60,
+    rankSpacing: 70,
+    useMaxWidth: false,
+  },
+};

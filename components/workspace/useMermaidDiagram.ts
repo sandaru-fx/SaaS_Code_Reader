@@ -3,7 +3,7 @@
 import { useEffect, useId, useState } from "react";
 
 import { buildFallbackDiagram } from "@/lib/mermaid/fallback-diagram";
-import { getMermaidConfig } from "@/lib/mermaid/mermaid-theme";
+import { getMermaidConfig, MERMAID_RENDER_OVERRIDES } from "@/lib/mermaid/mermaid-theme";
 import { prepareMermaidForRender } from "@/lib/mermaid/prepare-diagram";
 
 type RenderState =
@@ -21,7 +21,10 @@ function isDarkMode(): boolean {
 
 async function renderMermaidSource(source: string, renderId: string): Promise<string> {
   const mermaid = (await import("mermaid")).default;
-  mermaid.initialize(getMermaidConfig(isDarkMode()));
+  mermaid.initialize({
+    ...getMermaidConfig(isDarkMode()),
+    ...MERMAID_RENDER_OVERRIDES,
+  });
   const { svg } = await mermaid.render(renderId, source);
   return svg;
 }

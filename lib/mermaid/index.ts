@@ -10,7 +10,9 @@ export {
   CODERIDER_MERMAID_CONFIG,
   CODERIDER_MERMAID_DARK_CONFIG,
   getMermaidConfig,
+  MERMAID_RENDER_OVERRIDES,
 } from "@/lib/mermaid/mermaid-theme";
+export { enhanceMermaidWithStyles } from "@/lib/mermaid/enhance-mermaid-styles";
 export { prepareMermaidForRender } from "@/lib/mermaid/prepare-diagram";
 export { repairMermaid } from "@/lib/mermaid/repair-mermaid";
 export { sanitizeMermaid } from "@/lib/mermaid/sanitize-mermaid";
