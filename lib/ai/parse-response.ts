@@ -1,5 +1,5 @@
 import { GeminiError } from "@/lib/ai/errors";
-import { prepareMermaidForRender } from "@/lib/mermaid/prepare-diagram";
+import { cleanMermaidSource } from "@/lib/mermaid/prepare-diagram";
 import type { AnalyzeResponseBody } from "@/lib/ai/types";
 
 function stripOuterCodeFence(raw: string): string {
@@ -73,6 +73,6 @@ export function parseAnalyzeResponse(raw: string): AnalyzeResponseBody {
 
   return {
     explanation: parsed.explanation.trim(),
-    mermaid: prepareMermaidForRender(stripMermaidFence(parsed.mermaid)),
+    mermaid: cleanMermaidSource(stripMermaidFence(parsed.mermaid)),
   };
 }

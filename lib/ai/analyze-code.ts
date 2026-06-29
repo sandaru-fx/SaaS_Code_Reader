@@ -1,11 +1,12 @@
 import { GeminiError } from "@/lib/ai/errors";
-import { getGeminiModel } from "@/lib/ai/gemini";
+import { getGeminiModel, GEMINI_MODEL_PRO } from "@/lib/ai/gemini";
 import { parseAnalyzeResponse } from "@/lib/ai/parse-response";
 import {
   ANALYZE_SYSTEM_PROMPT,
   buildAnalyzeUserPrompt,
 } from "@/lib/ai/prompts";
 import type { AnalyzeRequestBody, AnalyzeResponseBody } from "@/lib/ai/types";
+import { validateDiagramShape } from "@/lib/mermaid/validate-diagram";
 
 function mapGeminiFailure(error: unknown): GeminiError {
   if (error instanceof GeminiError) {
@@ -60,7 +61,16 @@ async function requestStructuredAnalysis(
   request: AnalyzeRequestBody,
   strict: boolean
 ): Promise<AnalyzeResponseBody> {
-  const model = getGeminiModel({ systemInstruction: ANALYZE_SYSTEM_PROMPT });
+  const model = getGeminiModel({
+    systemInstruction: ANALYZE_SYSTEM_PROMPT,
+    model: GEMINI_MODEL_PRO,
+    generationConfig: {
+      temperature: strict ? 0.15 : 0.35,
+      topP: 0.9,
+      maxOutputTokens: 2048,
+      responseMimeType: "application/json",
+    },
+  });
   const prompt = buildAnalyzeUserPrompt(request, strict);
   const result = await model.generateContent(prompt);
   const text = result.response.text().trim();
@@ -75,12 +85,29 @@ async function requestStructuredAnalysis(
   return parseAnalyzeResponse(text);
 }
 
+async function analyzeWithValidation(
+  request: AnalyzeRequestBody,
+  strict: boolean
+): Promise<AnalyzeResponseBody> {
+  const response = await requestStructuredAnalysis(request, strict);
+  const validation = validateDiagramShape(response.mermaid);
+
+  if (!validation.ok) {
+    throw new GeminiError(
+      "generation-failed",
+      `Diagram failed quality check: ${validation.reason}`
+    );
+  }
+
+  return response;
+}
+
 export async function analyzeCode(
   request: AnalyzeRequestBody
 ): Promise<AnalyzeResponseBody> {
   try {
     try {
-      return await requestStructuredAnalysis(request, false);
+      return await analyzeWithValidation(request, false);
     } catch (firstError) {
       if (
         firstError instanceof GeminiError &&
@@ -89,7 +116,18 @@ export async function analyzeCode(
         throw firstError;
       }
 
-      return await requestStructuredAnalysis(request, true);
+      try {
+        return await analyzeWithValidation(request, true);
+      } catch (secondError) {
+        if (
+          secondError instanceof GeminiError &&
+          secondError.code !== "generation-failed"
+        ) {
+          throw secondError;
+        }
+
+        return await requestStructuredAnalysis(request, true);
+      }
     }
   } catch (error) {
     throw mapGeminiFailure(error);

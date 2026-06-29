@@ -1,11 +1,16 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI, type GenerationConfig } from "@google/generative-ai";
 
 import { GeminiError } from "@/lib/ai/errors";
 
-export const GEMINI_MODEL = "gemini-2.5-flash";
+export const GEMINI_MODEL_FAST = "gemini-2.5-flash";
+export const GEMINI_MODEL_PRO = "gemini-2.5-pro";
+
+export const GEMINI_MODEL = GEMINI_MODEL_FAST;
 
 type GeminiModelOptions = {
   systemInstruction?: string;
+  model?: string;
+  generationConfig?: GenerationConfig;
 };
 
 export function getGeminiModel(options?: GeminiModelOptions) {
@@ -20,7 +25,8 @@ export function getGeminiModel(options?: GeminiModelOptions) {
 
   const client = new GoogleGenerativeAI(apiKey);
   return client.getGenerativeModel({
-    model: GEMINI_MODEL,
+    model: options?.model ?? GEMINI_MODEL_FAST,
     systemInstruction: options?.systemInstruction,
+    generationConfig: options?.generationConfig,
   });
 }

@@ -252,12 +252,17 @@ function MermaidDiagramCanvas({
         onToggleFullscreen={toggleFullscreen}
       />
       <div
-        className={`overflow-auto rounded-xl border border-slate-200 bg-gradient-to-br from-emerald-50/80 via-white to-sky-50/80 p-4 dark:border-white/[0.08] dark:from-[#0f1f1a] dark:via-[#121212] dark:to-[#101827] ${
-          isFullscreen ? "max-h-[calc(100vh-8rem)] flex-1" : "max-h-[min(80vh,640px)] min-h-[400px]"
+        className={`relative overflow-auto rounded-2xl border border-slate-200/80 bg-gradient-to-br from-indigo-50/60 via-white to-sky-50/60 p-6 shadow-inner shadow-slate-900/[0.03] dark:border-white/[0.06] dark:from-[#0b1322] dark:via-[#0d1424] dark:to-[#101a30] dark:shadow-black/30 ${
+          isFullscreen ? "max-h-[calc(100vh-8rem)] flex-1" : "max-h-[min(80vh,640px)] min-h-[440px]"
         }`}
+        style={{
+          backgroundImage:
+            "radial-gradient(circle at 1px 1px, rgba(100,116,139,0.18) 1px, transparent 0)",
+          backgroundSize: "24px 24px",
+        }}
       >
         <div
-          className="mx-auto min-w-full origin-top transition-transform duration-150 [&_svg]:mx-auto [&_svg]:h-auto [&_svg]:max-w-none"
+          className="mx-auto min-w-full origin-top transition-transform duration-200 ease-out [&_svg]:mx-auto [&_svg]:h-auto [&_svg]:max-w-none [&_.node>rect]:drop-shadow-[0_4px_12px_rgba(15,23,42,0.18)] [&_.node>polygon]:drop-shadow-[0_4px_12px_rgba(15,23,42,0.18)] [&_.node>circle]:drop-shadow-[0_4px_12px_rgba(15,23,42,0.18)] [&_.edgePath_path]:transition-all"
           style={{ transform: `scale(${zoom})` }}
           dangerouslySetInnerHTML={{ __html: svg }}
         />
