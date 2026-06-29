@@ -77,6 +77,8 @@ export function AiPanel() {
     isFocusMode,
     dismissAnalysisError,
     openChat,
+    fileContent,
+    activeAnalyzeLabel,
   } = useWorkspace();
 
   return (
@@ -131,7 +133,11 @@ export function AiPanel() {
                     Zoom or open fullscreen to inspect the diagram
                   </p>
                 </div>
-                <MermaidDiagram mermaid={analysisResult.mermaid} />
+                <MermaidDiagram
+                  mermaid={analysisResult.mermaid}
+                  fallbackCode={fileContent ?? undefined}
+                  fallbackFileName={activeAnalyzeLabel ?? undefined}
+                />
               </div>
             ) : (
               <EmptyState

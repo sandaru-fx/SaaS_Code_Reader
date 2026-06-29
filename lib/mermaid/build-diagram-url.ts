@@ -5,7 +5,7 @@ import {
   MERMAID_INK_SVG_BASE_URL,
 } from "@/lib/mermaid/constants";
 import { encodeMermaidForInk } from "@/lib/mermaid/encode-mermaid";
-import { sanitizeMermaid } from "@/lib/mermaid/sanitize-mermaid";
+import { prepareMermaidForRender } from "@/lib/mermaid/prepare-diagram";
 
 export type DiagramFormat = "img" | "svg";
 
@@ -21,7 +21,7 @@ export function buildMermaidInkUrl(
   raw: string,
   format: DiagramFormat = "img"
 ): MermaidInkUrlResult {
-  const sanitized = sanitizeMermaid(raw);
+  const sanitized = prepareMermaidForRender(raw);
 
   if (sanitized.length === 0) {
     return {
